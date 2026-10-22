@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file GetTime.h
-/// \brief Returns the value from QueryPerformanceCounter.  This is the function RakNet uses to represent time. This time won't match the time returned by GetTimeCount(). See http://www.jenkinssoftware.com/forum/index.php?topic=2798.0
-///
+ /// \file GetTime.h
+ /// \brief Returns the value from QueryPerformanceCounter.  This is the function RakNet uses to represent time. This time won't match the time returned by GetTimeCount(). See http://www.jenkinssoftware.com/forum/index.php?topic=2798.0
+ ///
 
 
 #ifndef __GET_TIME_H
@@ -26,22 +26,22 @@
 
 namespace SLNet
 {
-	/// Same as GetTimeMS
-	/// Holds the time in either a 32 or 64 bit variable, depending on __GET_TIME_64BIT
-	SLNet::Time RAK_DLL_EXPORT GetTime( void );
+/// Same as GetTimeMS
+/// Holds the time in either a 32 or 64 bit variable, depending on __GET_TIME_64BIT
+SLNet::Time RAK_DLL_EXPORT GetTime(void);
 
-	/// Return the time as 32 bit
-	/// \note The maximum delta between returned calls is 1 second - however, RakNet calls this constantly anyway. See NormalizeTime() in the cpp.
-	SLNet::TimeMS RAK_DLL_EXPORT GetTimeMS( void );
-	
-	/// Return the time as 64 bit
-	/// \note The maximum delta between returned calls is 1 second - however, RakNet calls this constantly anyway. See NormalizeTime() in the cpp.
-	SLNet::TimeUS RAK_DLL_EXPORT GetTimeUS( void );
+/// Return the time as 32 bit
+/// \note The maximum delta between returned calls is 1 second - however, RakNet calls this constantly anyway. See NormalizeTime() in the cpp.
+SLNet::TimeMS RAK_DLL_EXPORT GetTimeMS(void);
 
-	/// a > b?
-	extern RAK_DLL_EXPORT bool GreaterThan(SLNet::Time a, SLNet::Time b);
-	/// a < b?
-	extern RAK_DLL_EXPORT bool LessThan(SLNet::Time a, SLNet::Time b);
+/// Return the time as 64 bit
+/// \note The maximum delta between returned calls is 1 second - however, RakNet calls this constantly anyway. See NormalizeTime() in the cpp.
+SLNet::TimeUS RAK_DLL_EXPORT GetTimeUS(void);
+
+/// a > b?
+extern RAK_DLL_EXPORT bool GreaterThan(SLNet::Time a, SLNet::Time b);
+/// a < b?
+extern RAK_DLL_EXPORT bool LessThan(SLNet::Time a, SLNet::Time b);
 }
 
 #endif

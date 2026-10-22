@@ -172,7 +172,7 @@ class ofApp : public ofxUnitTestsApp {
 		}
 	}
 
-	// SLikeNet's crypto helpers, ported to OpenSSL 1.1+ (patch 0003)
+	// SLikeNet's crypto helpers on OpenSSL 1.1+ (Sabrosa's fork)
 	void testCrypto() {
 		using SLNet::Experimental::Crypto::CCryptoManager;
 		ofxTest(CCryptoManager::Initialize(), "CCryptoManager::Initialize (OpenSSL)");

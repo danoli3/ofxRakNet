@@ -9,7 +9,7 @@
  */
 #pragma once
 
-#ifdef __linux__
+#ifndef _WIN32
 #define _TRUNCATE ((size_t)-1)
 typedef int errno_t;
 
@@ -37,7 +37,7 @@ template<size_t BufferSize> errno_t mbstowcs_s(size_t *pReturnValue, wchar_t(&wc
 	return mbstowcs_s(pReturnValue, wcstr, BufferSize, mbstr, count);
 }
 
-template<size_t BufferSize> int sprintf_s(char (&buffer)[BufferSize], const char* format, ...)
+template<size_t BufferSize> int sprintf_s(char(&buffer)[BufferSize], const char* format, ...)
 {
 	va_list arglist;
 	va_start(arglist, format);
@@ -47,12 +47,12 @@ template<size_t BufferSize> int sprintf_s(char (&buffer)[BufferSize], const char
 	return numCharsWritten;
 }
 
-template<size_t BufferSize> errno_t strcat_s(char (&strDestination)[BufferSize], const char* strSource)
+template<size_t BufferSize> errno_t strcat_s(char(&strDestination)[BufferSize], const char* strSource)
 {
 	return strcat_s(strDestination, BufferSize, strSource);
 }
 
-template<size_t BufferSize> errno_t strcpy_s(char (&strDestination)[BufferSize], const char* strSource)
+template<size_t BufferSize> errno_t strcpy_s(char(&strDestination)[BufferSize], const char* strSource)
 {
 	return strcpy_s(strDestination, BufferSize, strSource);
 }
@@ -72,9 +72,9 @@ template<size_t BufferSize> errno_t strncpy_s(char(&strDest)[BufferSize], const 
 	return strncpy_s(strDest, BufferSize, strSource, count);
 }
 
-template<size_t BufferSize> int vsnprintf_s(char (&buffer)[BufferSize], size_t count, const char *format, va_list argptr)
+template<size_t BufferSize> int vsnprintf_s(char(&buffer)[BufferSize], size_t count, const char *format, va_list argptr)
 {
 	return vsnprintf_s(buffer, BufferSize, count, format, argptr);
 }
 
-#endif
+#endif // _WIN32

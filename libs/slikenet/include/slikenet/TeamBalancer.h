@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,11 +13,11 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file TeamBalancer.h
-/// \brief Set and network team selection (supports peer to peer or client/server)
-/// \details Automatically handles transmission and resolution of team selection, including team switching and balancing
-/// \deprecated Use TeamManager intead
-///
+ /// \file TeamBalancer.h
+ /// \brief Set and network team selection (supports peer to peer or client/server)
+ /// \details Automatically handles transmission and resolution of team selection, including team switching and balancing
+ /// \deprecated Use TeamManager intead
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -26,11 +26,11 @@
 #ifndef __TEAM_BALANCER_H
 #define __TEAM_BALANCER_H
 
+#include <slikenet/NativeTypes.h>
 #include "PluginInterface2.h"
 #include "memoryoverride.h"
-#include "NativeTypes.h"
 #include "DS_List.h"
-#include "string.h"
+#include <slikenet/string.h>
 
 namespace SLNet
 {
@@ -61,7 +61,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(TeamBalancer)
 
-	TeamBalancer();
+		TeamBalancer();
 	virtual ~TeamBalancer();
 
 	/// \brief Set the limit to the number of players on the specified team
@@ -156,7 +156,7 @@ protected:
 	/// \internal
 	virtual PluginReceiveResult OnReceive(Packet *packet);
 	/// \internal
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 	/// \internal
 	void OnAttach(void);
 

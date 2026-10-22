@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -33,8 +33,12 @@ struct CloudQueryRow;
 class RAK_DLL_EXPORT CloudAllocator
 {
 public:
-	CloudAllocator() {}
-	virtual ~CloudAllocator() {}
+	CloudAllocator()
+	{
+	}
+	virtual ~CloudAllocator()
+	{
+	}
 
 	/// \brief Allocate a row
 	virtual CloudQueryRow* AllocateCloudQueryRow(void);
@@ -50,9 +54,15 @@ public:
 /// \ingroup CLOUD_GROUP
 struct RAK_DLL_EXPORT CloudKey
 {
-	CloudKey() {}
-	CloudKey(SLNet::RakString _primaryKey, uint32_t _secondaryKey) : primaryKey(_primaryKey), secondaryKey(_secondaryKey) {}
-	~CloudKey() {}
+	CloudKey()
+	{
+	}
+	CloudKey(SLNet::RakString _primaryKey, uint32_t _secondaryKey) : primaryKey(_primaryKey), secondaryKey(_secondaryKey)
+	{
+	}
+	~CloudKey()
+	{
+	}
 
 	/// Identifies the primary key. This is intended to be a major category, such as the name of the application
 	/// Must be non-empty
@@ -72,7 +82,10 @@ int CloudKeyComp(const CloudKey &key, const CloudKey &data);
 /// \ingroup CLOUD_GROUP
 struct RAK_DLL_EXPORT CloudQuery
 {
-	CloudQuery() {startingRowIndex=0; maxRowsToReturn=0; subscribeToResults=false;}
+	CloudQuery()
+	{
+		startingRowIndex = 0; maxRowsToReturn = 0; subscribeToResults = false;
+	}
 
 	/// List of keys to query. Must be at least of length 1.
 	/// This query is run on uploads from all clients, and those that match the combination of primaryKey and secondaryKey are potentially returned

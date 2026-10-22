@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,8 +13,8 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-///
+ /// \file
+ ///
 
 
 #ifndef __NETWORK_ID_MANAGER_H
@@ -43,20 +43,21 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(NetworkIDManager)
 
-	NetworkIDManager();
+		NetworkIDManager();
 	virtual ~NetworkIDManager(void);
 
 	/// Returns the parent object, or this instance if you don't use a parent.
 	/// Supports NetworkIDObject anywhere in the inheritance hierarchy
 	/// \pre You must first call SetNetworkIDManager before using this function
 	template <class returnType>
-	returnType GET_OBJECT_FROM_ID(NetworkID x) {
+	returnType GET_OBJECT_FROM_ID(NetworkID x)
+	{
 		NetworkIDObject *nio = GET_BASE_OBJECT_FROM_ID(x);
-		if (nio==0)
+		if(nio == 0)
 			return 0;
-		if (nio->GetParent())
-			return (returnType) nio->GetParent();
-		return (returnType) nio;
+		if(nio->GetParent())
+			return (returnType)nio->GetParent();
+		return (returnType)nio;
 	}
 
 	// Stop tracking all NetworkID objects

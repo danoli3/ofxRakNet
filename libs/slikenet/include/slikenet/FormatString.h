@@ -3,13 +3,13 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  */
 
-/// \file FormatString.h
-///
+ /// \file FormatString.h
+ ///
 
 
 #ifndef __FORMAT_STRING_H
@@ -18,11 +18,11 @@
 #include "Export.h"
 
 extern "C" {
-char * FormatString(const char *format, ...);
+	char * FormatString(const char *format, ...);
 }
 // Threadsafe
 extern "C" {
-char * FormatStringTS(char *output, const char *format, ...);
+	char * FormatStringTS(char *output, const char *format, ...);
 }
 
 

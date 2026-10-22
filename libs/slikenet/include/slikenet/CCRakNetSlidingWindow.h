@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,32 +13,32 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/*
-http://www.ssfnet.org/Exchange/tcp/tcpTutorialNotes.html
+ /*
+ http://www.ssfnet.org/Exchange/tcp/tcpTutorialNotes.html
 
-cwnd=max bytes allowed on wire at once
+ cwnd=max bytes allowed on wire at once
 
-Start:
-cwnd=mtu
-ssthresh=unlimited
+ Start:
+ cwnd=mtu
+ ssthresh=unlimited
 
-Slow start:
-On ack cwnd*=2
+ Slow start:
+ On ack cwnd*=2
 
-congestion avoidance:
-On ack during new period
-cwnd+=mtu*mtu/cwnd
+ congestion avoidance:
+ On ack during new period
+ cwnd+=mtu*mtu/cwnd
 
-on loss or duplicate ack during period:
-sshtresh=cwnd/2
-cwnd=MTU
-This reenters slow start
+ on loss or duplicate ack during period:
+ sshtresh=cwnd/2
+ cwnd=MTU
+ This reenters slow start
 
-If cwnd < ssthresh, then use slow start
-else use congestion avoidance
+ If cwnd < ssthresh, then use slow start
+ else use congestion avoidance
 
 
-*/
+ */
 
 #include "defines.h"
 
@@ -47,12 +47,12 @@ else use congestion avoidance
 #ifndef __CONGESTION_CONTROL_SLIDING_WINDOW_H
 #define __CONGESTION_CONTROL_SLIDING_WINDOW_H
 
-#include "NativeTypes.h"
+#include <slikenet/NativeTypes.h>
 #include "time.h"
 #include "types.h"
 #include "DS_Queue.h"
 
-/// Sizeof an UDP header in byte
+ /// Sizeof an UDP header in byte
 #define UDP_HEADER_SIZE 28
 
 #define CC_DEBUG_PRINTF_1(x)
@@ -85,8 +85,8 @@ namespace SLNet
 
 class CCRakNetSlidingWindow
 {
-	public:
-	
+public:
+
 	CCRakNetSlidingWindow();
 	~CCRakNetSlidingWindow();
 
@@ -133,13 +133,13 @@ class CCRakNetSlidingWindow
 	/// Call this when an ACK arrives.
 	/// hasBAndAS are possibly written with the ack, see OnSendAck()
 	/// B and AS are used in the calculations in UpdateWindowSizeAndAckOnAckPerSyn
-	/// B and AS are updated at most once per SYN 
-	void OnAck(CCTimeType curTime, CCTimeType rtt, bool hasBAndAS, BytesPerMicrosecond _B, BytesPerMicrosecond _AS, double totalUserDataBytesAcked, bool isContinuousSend, DatagramSequenceNumberType sequenceNumber );
-	void OnDuplicateAck( CCTimeType curTime, DatagramSequenceNumberType sequenceNumber );
-	
+	/// B and AS are updated at most once per SYN
+	void OnAck(CCTimeType curTime, CCTimeType rtt, bool hasBAndAS, BytesPerMicrosecond B, BytesPerMicrosecond AS, double totalUserDataBytesAcked, bool isContinuousSend, DatagramSequenceNumberType sequenceNumber);
+	void OnDuplicateAck(CCTimeType curTime, DatagramSequenceNumberType sequenceNumber);
+
 	/// Call when you send an ack, to see if the ack should have the B and AS parameters transmitted
 	/// Call before calling OnSendAck()
-	void OnSendAckGetBAndAS(CCTimeType curTime, bool *hasBAndAS, BytesPerMicrosecond *_B, BytesPerMicrosecond *_AS);
+	void OnSendAckGetBAndAS(CCTimeType curTime, bool *hasBAndAS, BytesPerMicrosecond *B, BytesPerMicrosecond *AS);
 
 	/// Call when we send an ack, to write B and AS if needed
 	/// B and AS are only written once per SYN, to prevent slow calculations
@@ -150,7 +150,7 @@ class CCRakNetSlidingWindow
 	/// Call when we send a NACK
 	/// Also updates SND, the period between sends, since data is written out
 	void OnSendNACK(CCTimeType curTime, uint32_t numBytes);
-	
+
 	/// Retransmission time out for the sender
 	/// If the time difference between when a message was last transmitted, and the current time is greater than RTO then packet is eligible for retransmission, pending congestion control
 	/// RTO = (RTT + 4 * RTTVar) + SYN
@@ -167,28 +167,46 @@ class CCRakNetSlidingWindow
 	uint32_t GetMTU(void) const;
 
 	/// Query for statistics
-	BytesPerMicrosecond GetLocalSendRate(void) const {return 0;}
+	BytesPerMicrosecond GetLocalSendRate(void) const
+	{
+		return 0;
+	}
 	BytesPerMicrosecond GetLocalReceiveRate(CCTimeType currentTime) const;
-	BytesPerMicrosecond GetRemoveReceiveRate(void) const {return 0;}
+	BytesPerMicrosecond GetRemoveReceiveRate(void) const
+	{
+		return 0;
+	}
 	//BytesPerMicrosecond GetEstimatedBandwidth(void) const {return B;}
-	BytesPerMicrosecond GetEstimatedBandwidth(void) const {return GetLinkCapacityBytesPerSecond()*1000000.0;}
-	double GetLinkCapacityBytesPerSecond(void) const {return 0;}
+	BytesPerMicrosecond GetEstimatedBandwidth(void) const
+	{
+		return GetLinkCapacityBytesPerSecond() * 1000000.0;
+	}
+	double GetLinkCapacityBytesPerSecond(void) const
+	{
+		return 0;
+	}
 
 	/// Query for statistics
 	double GetRTT(void) const;
 
-	bool GetIsInSlowStart(void) const {return IsInSlowStart();}
-	uint32_t GetCWNDLimit(void) const {return (uint32_t) 0;}
+	bool GetIsInSlowStart(void) const
+	{
+		return IsInSlowStart();
+	}
+	uint32_t GetCWNDLimit(void) const
+	{
+		return (uint32_t)0;
+	}
 
 
 	/// Is a > b, accounting for variable overflow?
 	static bool GreaterThan(DatagramSequenceNumberType a, DatagramSequenceNumberType b);
 	/// Is a < b, accounting for variable overflow?
 	static bool LessThan(DatagramSequenceNumberType a, DatagramSequenceNumberType b);
-//	void SetTimeBetweenSendsLimit(unsigned int bitsPerSecond);
+	//	void SetTimeBetweenSendsLimit(unsigned int bitsPerSecond);
 	uint64_t GetBytesPerSecondLimitByCongestionControl(void) const;
-	  
-	protected:
+
+protected:
 
 	// Maximum amount of bytes that the user can send, e.g. the size of one full datagram
 	uint32_t MAXIMUM_MTU_INCLUDING_UDP_HEADER;

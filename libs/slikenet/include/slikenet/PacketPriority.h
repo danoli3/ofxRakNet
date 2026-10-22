@@ -3,14 +3,14 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  */
 
-/// \file
-/// \brief This file contains enumerations for packet priority and reliability enumerations.
-///
+ /// \file
+ /// \brief This file contains enumerations for packet priority and reliability enumerations.
+ ///
 
 
 
@@ -29,7 +29,7 @@ enum PacketPriority
 
 	/// For every 2 HIGH_PRIORITY messages, 1 MEDIUM_PRIORITY will be sent.
 	/// Messages at this priority and lower are buffered to be sent in groups at 10 millisecond intervals to reduce UDP overhead and better measure congestion control. 
-	MEDIUM_PRIORITY,   
+	MEDIUM_PRIORITY,
 
 	/// For every 2 MEDIUM_PRIORITY messages, 1 LOW_PRIORITY will be sent.
 	/// Messages at this priority and lower are buffered to be sent in groups at 10 millisecond intervals to reduce UDP overhead and better measure congestion control. 

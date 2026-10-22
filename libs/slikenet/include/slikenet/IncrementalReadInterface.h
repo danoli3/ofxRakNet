@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -25,8 +25,12 @@ namespace SLNet
 class RAK_DLL_EXPORT IncrementalReadInterface
 {
 public:
-	IncrementalReadInterface() {}
-	virtual ~IncrementalReadInterface() {}
+	IncrementalReadInterface()
+	{
+	}
+	virtual ~IncrementalReadInterface()
+	{
+	}
 
 	/// Read part of a file into \a destination
 	/// Return the number of bytes written. Return 0 when file is done.
@@ -35,7 +39,7 @@ public:
 	/// \param[in] numBytesToRead How many bytes to read. This is also how many bytes have been allocated to preallocatedDestination
 	/// \param[out] preallocatedDestination Write your data here
 	/// \return The number of bytes read, or 0 if none
-	virtual unsigned int GetFilePart( const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, void *preallocatedDestination, FileListNodeContext context);
+	virtual unsigned int GetFilePart(const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, void *preallocatedDestination, FileListNodeContext context);
 };
 
 } // namespace SLNet

@@ -1,8 +1,8 @@
 #pragma once
 
-// ofxRakNet: RakNet networking for openFrameworks, built on SLikeNet
-// (https://github.com/SLikeSoft/SLikeNet), the maintained RakNet 4 fork, with
-// security fixes (see libs/slikenet/PATCHES.md).
+// ofxRakNet: RakNet networking for openFrameworks, built on SLikeNet (this
+// branch: Sabrosa's maintained fork, https://gitlab.com/Sabrosa/slikenet), with
+// security and macOS fixes (see libs/slikenet/PATCHES.md).
 //
 // ofxRakNet::Peer wraps a RakPeerInterface: start it as a server or a client,
 // send messages, and get connection / message events from update(), on the

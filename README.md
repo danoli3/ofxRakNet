@@ -5,11 +5,13 @@
 RakNet networking for openFrameworks: reliable UDP for multiplayer, installations and anything else
 that needs to talk between machines, with connection events and message delivery on the main thread.
 
-It's built on [SLikeNet](https://github.com/SLikeSoft/SLikeNet), the maintained fork of RakNet 4
-(RakNet itself, by Oculus / Facebook, is archived). SLikeNet's core is included as source in
-`libs/slikenet`, with fixes for remote memory-safety bugs in large-message reassembly and a crash on
-current compilers, and its OpenSSL parts (TLS for `TCPInterface` / HTTP, and the `crypto` helpers)
-ported to the OpenSSL openFrameworks ships: see [libs/slikenet/PATCHES.md](libs/slikenet/PATCHES.md).
+**This is the `sabrosa` branch:** it's built on [Sabrosa's SLikeNet](https://gitlab.com/Sabrosa/slikenet),
+a fork of [SLikeNet](https://github.com/SLikeSoft/SLikeNet) (the maintained fork of RakNet 4; RakNet
+itself, by Oculus / Facebook, is archived) that is still updated (2026): IPv6 and dual-stack sockets on
+by default, OpenSSL 1.1+, and a number of fixes. The core is included as source in `libs/slikenet`,
+with fixes for a remote memory-safety bug in large-message reassembly and for sending on macOS: see
+[libs/slikenet/PATCHES.md](libs/slikenet/PATCHES.md). `master` uses SLikeNet itself. Messages are
+limited to 4 MB on this branch.
 
 > **Consider [ofxENet](https://github.com/danoli3/ofxENet) once it's complete.** SLikeNet hasn't had a
 > code change since 2021, and RakNet itself is archived, so this addon carries its own fixes (see
@@ -105,7 +107,7 @@ the next find the port taken and connect to it. To connect across machines, set 
 | `example_cursors` | every copy's mouse cursor in every window (unreliable sequenced, relayed by the server) |
 | `example_chat` | type and press Enter: JSON lines to everyone (reliable ordered) |
 | `example_imgui_messenger` | needs [ofxImGui](https://github.com/jvcleave/ofxImGui) (`develop`): connection settings, a passphrase for encryption (with key fingerprint), a peer list with ping (pick who to send to, kick), compose text or JSON with any reliability / priority / channel, a chat view (name: text) and a filterable log with each message's SHA-256, and server relay with the original sender framed in. Start encrypted with `"passphrase"` in `settings.json` or `OFXRAKNET_PASSPHRASE` |
-| `example_tests` | the addon's tests, headless: servers and clients on localhost, text, JSON, a 1 MB message, broadcast, passwords, full servers, the split-packet patch, and SLikeNet's AES helpers, and ofxRakNet's encryption (cipher, salts, tampering, wrong passphrases, encrypted peers) (68 checks) |
+| `example_tests` | the addon's tests, headless: servers and clients on localhost, text, JSON, a 1 MB message, broadcast, passwords, full servers, the split-packet patch, SLikeNet's AES helpers, and ofxRakNet's encryption (cipher, salts, tampering, wrong passphrases, encrypted peers) (68 checks) |
 
 Build them with projectGenerator, or copy `scripts/templates/<platform>/Makefile` and `config.make`
 into the example folder.

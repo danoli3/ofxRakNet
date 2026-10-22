@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file DS_ThreadsafeAllocatingQueue.h
-/// \internal
-/// A threadsafe queue, that also uses a memory pool for allocation
+ /// \file DS_ThreadsafeAllocatingQueue.h
+ /// \internal
+ /// A threadsafe queue, that also uses a memory pool for allocation
 
 #ifndef __THREADSAFE_ALLOCATING_QUEUE
 #define __THREADSAFE_ALLOCATING_QUEUE
@@ -43,9 +43,9 @@ public:
 	structureType *Pop(void);
 	void SetPageSize(int size);
 	bool IsEmpty(void);
-	structureType * operator[] ( unsigned int position );
-	void RemoveAtIndex( unsigned int position );
-	unsigned int Size( void );
+	structureType * operator[] (unsigned int position);
+	void RemoveAtIndex(unsigned int position);
+	unsigned int Size(void);
 
 	// Memory pool operations
 	structureType *Allocate(const char *file, unsigned int line);
@@ -58,12 +58,12 @@ protected:
 	Queue<structureType*> queue;
 	SLNet::SimpleMutex queueMutex;
 };
-	
+
 template <class structureType>
 void ThreadsafeAllocatingQueue<structureType>::Push(structureType *s)
 {
 	queueMutex.Lock();
-	queue.Push(s, _FILE_AND_LINE_ );
+	queue.Push(s, _FILE_AND_LINE_);
 	queueMutex.Unlock();
 }
 
@@ -71,14 +71,14 @@ template <class structureType>
 structureType *ThreadsafeAllocatingQueue<structureType>::PopInaccurate(void)
 {
 	structureType *s;
-	if (queue.IsEmpty())
+	if(queue.IsEmpty())
 		return 0;
 	queueMutex.Lock();
-	if (queue.IsEmpty()==false)
-		s=queue.Pop();
+	if(queue.IsEmpty() == false)
+		s = queue.Pop();
 	else
-		s=0;
-	queueMutex.Unlock();	
+		s = 0;
+	queueMutex.Unlock();
 	return s;
 }
 
@@ -87,13 +87,13 @@ structureType *ThreadsafeAllocatingQueue<structureType>::Pop(void)
 {
 	structureType *s;
 	queueMutex.Lock();
-	if (queue.IsEmpty())
+	if(queue.IsEmpty())
 	{
-		queueMutex.Unlock();	
+		queueMutex.Unlock();
 		return 0;
 	}
-	s=queue.Pop();
-	queueMutex.Unlock();	
+	s = queue.Pop();
+	queueMutex.Unlock();
 	return s;
 }
 
@@ -102,7 +102,7 @@ structureType *ThreadsafeAllocatingQueue<structureType>::Allocate(const char *fi
 {
 	structureType *s;
 	memoryPoolMutex.Lock();
-	s=memoryPool.Allocate(file, line);
+	s = memoryPool.Allocate(file, line);
 	memoryPoolMutex.Unlock();
 	// Call new operator, memoryPool doesn't do this
 	s = new ((void*)s) structureType;
@@ -122,7 +122,7 @@ template <class structureType>
 void ThreadsafeAllocatingQueue<structureType>::Clear(const char *file, unsigned int line)
 {
 	memoryPoolMutex.Lock();
-	for (unsigned int i=0; i < queue.Size(); i++)
+	for(unsigned int i = 0; i < queue.Size(); i++)
 	{
 		queue[i]->~structureType();
 		memoryPool.Release(queue[i], file, line);
@@ -145,23 +145,23 @@ bool ThreadsafeAllocatingQueue<structureType>::IsEmpty(void)
 {
 	bool isEmpty;
 	queueMutex.Lock();
-	isEmpty=queue.IsEmpty();
+	isEmpty = queue.IsEmpty();
 	queueMutex.Unlock();
 	return isEmpty;
 }
 
 template <class structureType>
-structureType * ThreadsafeAllocatingQueue<structureType>::operator[] ( unsigned int position )
+structureType * ThreadsafeAllocatingQueue<structureType>::operator[] (unsigned int position)
 {
 	structureType *s;
 	queueMutex.Lock();
-	s=queue[position];
+	s = queue[position];
 	queueMutex.Unlock();
 	return s;
 }
 
 template <class structureType>
-void ThreadsafeAllocatingQueue<structureType>::RemoveAtIndex( unsigned int position )
+void ThreadsafeAllocatingQueue<structureType>::RemoveAtIndex(unsigned int position)
 {
 	queueMutex.Lock();
 	queue.RemoveAtIndex(position);
@@ -169,11 +169,11 @@ void ThreadsafeAllocatingQueue<structureType>::RemoveAtIndex( unsigned int posit
 }
 
 template <class structureType>
-unsigned int ThreadsafeAllocatingQueue<structureType>::Size( void )
+unsigned int ThreadsafeAllocatingQueue<structureType>::Size(void)
 {
 	unsigned int s;
 	queueMutex.Lock();
-	s=queue.Size();
+	s = queue.Size();
 	queueMutex.Unlock();
 	return s;
 }

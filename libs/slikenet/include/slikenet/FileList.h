@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,8 +13,8 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file FileList.h
-///
+ /// \file FileList.h
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -51,7 +51,7 @@ struct FileListNode
 	/// Full path to the file, which may be different than filename
 	SLNet::RakString fullPathToFile;
 
-	/// File data (may be null if not ready)
+	/// File data (may be nullptr if not ready)
 	char *data;
 
 	/// Length of \a data. May be greater than fileLength if prepended with a file hash
@@ -61,7 +61,7 @@ struct FileListNode
 	unsigned fileLengthBytes;
 
 	/// User specific data for whatever, describing this file.
-	FileListNodeContext context; 
+	FileListNodeContext context;
 
 	/// If true, data and dataLengthBytes should be empty. This is just storing the filename
 	bool isAReference;
@@ -74,28 +74,35 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(FileListProgress)
 
-	FileListProgress() {}
-	virtual ~FileListProgress() {}
+		FileListProgress()
+	{
+	}
+	virtual ~FileListProgress()
+	{
+	}
 
 	/// First callback called when FileList::AddFilesFromDirectory() starts
-	virtual void OnAddFilesFromDirectoryStarted(FileList *fileList, char *dir) {
-		(void) fileList;
-		(void) dir;
+	virtual void OnAddFilesFromDirectoryStarted(FileList *fileList, char *dir)
+	{
+		(void)fileList;
+		(void)dir;
 	}
 
 	/// Called for each directory, when that directory begins processing
-	virtual void OnDirectory(FileList *fileList, char *dir, unsigned int directoriesRemaining) {
-		(void) fileList;
-		(void) dir;
-		(void) directoriesRemaining;
+	virtual void OnDirectory(FileList *fileList, char *dir, unsigned int directoriesRemaining)
+	{
+		(void)fileList;
+		(void)dir;
+		(void)directoriesRemaining;
 	}
 
 	/// Called for each file, when that file begins processing
-	virtual void OnFile(FileList *fileList, char *dir, char *fileName, unsigned int fileSize) {
-		(void) fileList;
-		(void) dir;
-		(void) fileName;
-		(void) fileSize;
+	virtual void OnFile(FileList *fileList, char *dir, char *fileName, unsigned int fileSize)
+	{
+		(void)fileList;
+		(void)dir;
+		(void)fileName;
+		(void)fileSize;
 	}
 
 	/// \brief This function is called when we are sending a file to a remote system.
@@ -107,26 +114,26 @@ public:
 	/// \param[in] targetSystem Who we are sending to
 	virtual void OnFilePush(const char *fileName, unsigned int fileLengthBytes, unsigned int offset, unsigned int bytesBeingSent, bool done, SystemAddress targetSystem, unsigned short setId)
 	{
-		(void) fileName;
-		(void) fileLengthBytes;
-		(void) offset;
-		(void) bytesBeingSent;
-		(void) done;
-		(void) targetSystem;
-        (void) setId;
+		(void)fileName;
+		(void)fileLengthBytes;
+		(void)offset;
+		(void)bytesBeingSent;
+		(void)done;
+		(void)targetSystem;
+		(void)setId;
 	}
 
 	/// \brief This function is called when all files have been read and are being transferred to a remote system
-	virtual void OnFilePushesComplete( SystemAddress systemAddress, unsigned short setId )
+	virtual void OnFilePushesComplete(SystemAddress systemAddress, unsigned short setId)
 	{
-		(void) systemAddress;
-        (void) setId;
+		(void)systemAddress;
+		(void)setId;
 	}
 
 	/// \brief This function is called when a send to a system was aborted (probably due to disconnection)
-	virtual void OnSendAborted( SystemAddress systemAddress )
+	virtual void OnSendAborted(SystemAddress systemAddress)
 	{
-		(void) systemAddress;
+		(void)systemAddress;
 	}
 };
 
@@ -137,8 +144,12 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(FLP_Printf)
 
-	FLP_Printf() {}
-	virtual ~FLP_Printf() {}
+		FLP_Printf()
+	{
+	}
+	virtual ~FLP_Printf()
+	{
+	}
 
 	/// First callback called when FileList::AddFilesFromDirectory() starts
 	virtual void OnAddFilesFromDirectoryStarted(FileList *fileList, char *dir);
@@ -147,10 +158,10 @@ public:
 	virtual void OnDirectory(FileList *fileList, char *dir, unsigned int directoriesRemaining);
 
 	/// \brief This function is called when all files have been transferred to a particular remote system
-    virtual void OnFilePushesComplete( SystemAddress systemAddress, unsigned short setID );
+	virtual void OnFilePushesComplete(SystemAddress systemAddress, unsigned short setID);
 
 	/// \brief This function is called when a send to a system was aborted (probably due to disconnection)
-	virtual void OnSendAborted( SystemAddress systemAddress );
+	virtual void OnSendAborted(SystemAddress systemAddress);
 };
 
 class RAK_DLL_EXPORT FileList
@@ -159,7 +170,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(FileList)
 
-	FileList();
+		FileList();
 	~FileList();
 	/// \brief Add all the files at a given directory.
 	/// \param[in] applicationDirectory The first part of the path. This is not stored as part of the filename.  Use \ as the path delineator.
@@ -221,7 +232,7 @@ public:
 	/// \param[in] context User defined byte to store with each file. Use for whatever you want.
 	/// \param[in] isAReference Means that this is just a reference to a file elsewhere - does not actually have any data
 	/// \param[in] takeDataPointer If true, do not allocate dataLength. Just take the pointer passed to the \a data parameter
-	void AddFile(const char *filename, const char *fullPathToFile, const char *data, const unsigned dataLength, const unsigned fileLength, FileListNodeContext context, bool isAReference=false, bool takeDataPointer=false);
+	void AddFile(const char *filename, const char *fullPathToFile, const char *data, const unsigned dataLength, const unsigned fileLength, FileListNodeContext context, bool isAReference = false, bool takeDataPointer = false);
 
 	/// \brief Add a file, reading it from disk.
 	/// \param[in] filepath Complete path to the file, including the filename itself

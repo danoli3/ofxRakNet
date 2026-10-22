@@ -18,7 +18,7 @@
 * @brief CheckSum implementation from http://www.flounder.com/checksum.htm
 * 
 */
-#include "slikenet/CheckSum.h"
+#include <slikenet/CheckSum.h>
 
 /****************************************************************************
 *        CheckSum::add

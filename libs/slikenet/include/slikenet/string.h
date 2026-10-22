@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -14,13 +14,14 @@
  */
 
 #ifndef __RAK_STRING_H
-#define __RAK_STRING_H 
+#define __RAK_STRING_H
 
+#include <stdio.h>
+#include <stdarg.h>
 #include "Export.h"
 #include "DS_List.h"
 #include "types.h" // int64_t
-#include <stdio.h>
-#include "stdarg.h"
+#include "defines.h"
 
 #ifdef _WIN32
 #include "WindowsIncludes.h"
@@ -44,119 +45,143 @@ public:
 	RakString();
 	RakString(char input);
 	RakString(unsigned char input);
-	RakString(const unsigned char *format, ...);
-	RakString(const char *format, ...);
+	RakString(const char *input);
+	RakString(const unsigned char *input);
+	RakString(const RakString& rhs);
 	~RakString();
-	RakString( const RakString & rhs);
 
-	/// Implicit return of const char*
-	operator const char* () const {return sharedString->c_str;}
+#if USE_IMPLICIT_CONVERSIONS
+	/// Implicit conversion to const char*
+	operator const char*() const
+	{
+		return sharedString->c_str;
+	}
+#endif
 
-	/// Same as std::string::c_str
-	const char *C_String(void) const {return sharedString->c_str;}
+	/// Same as std::string::c_str()
+	const char *C_String() const
+	{
+		return sharedString->c_str;
+	}
 
 	// Lets you modify the string. Do not make the string longer - however, you can make it shorter, or change the contents.
 	// Pointer is only valid in the scope of RakString itself
-	char *C_StringUnsafe(void) {Clone(); return sharedString->c_str;}
+	char *C_StringUnsafe()
+	{
+		Clone();
+		return sharedString->c_str;
+	}
 
 	/// Assigment operators
-	RakString& operator = ( const RakString& rhs );
-	RakString& operator = ( const char *str );
-	RakString& operator = ( char *str );
-	RakString& operator = ( const unsigned char *str );
-	RakString& operator = ( char unsigned *str );
-	RakString& operator = ( const char c );
+	RakString& operator=(const RakString& rhs);
+	RakString& operator=(const char *str);
+	RakString& operator=(const unsigned char *str);
+	RakString& operator=(char c);
 
 	/// Concatenation
-	RakString& operator +=( const RakString& rhs);
-	RakString& operator += ( const char *str );
-	RakString& operator += ( char *str );
-	RakString& operator += ( const unsigned char *str );
-	RakString& operator += ( char unsigned *str );
-	RakString& operator += ( const char c );
+	RakString& operator+=(const RakString& rhs);
+	RakString& operator+=(const char *str);
+	RakString& operator+=(const unsigned char *str);
+	RakString& operator+=(char c);
 
 	/// Character index. Do not use to change the string however.
-	unsigned char operator[] ( const unsigned int position ) const;
+	unsigned char operator[](size_t position) const;
+	char At(size_t position) const;
 
 #ifdef _WIN32
 	// Return as Wide char
 	// Deallocate with DeallocWideChar
-	WCHAR * ToWideChar(void);
-	void DeallocWideChar(WCHAR * w);
+	wchar_t *ToWideChar() const;
+	static void DeallocWideChar(wchar_t *w);
 
 	void FromWideChar(const wchar_t *source);
 	static SLNet::RakString FromWideChar_S(const wchar_t *source);
 #endif
-	
+
 	/// String class find replacement
 	/// Searches the string for the content specified in stringToFind and returns the position of the first occurrence in the string.
-	/// Search only includes characters on or after position pos, ignoring any possible occurrences in previous locations.
+	/// Search only includes characters on or after position index, ignoring any possible occurrences in previous locations.
 	/// \param[in] stringToFind The string to find inside of this object's string
-	/// \param[in] pos The position in the string to start the search
-	/// \return Returns the position of the first occurrence in the string.
-	size_t Find(const char *stringToFind,size_t pos = 0 );
+	/// \param[in] index The position in the string to start the search
+	/// \return Returns the position of the first occurrence in the string or -1 if it couldn't be found.
+	size_t Find(const char *stringToFind, size_t index = 0) const;
 
 	/// Equality
-	bool operator==(const RakString &rhs) const;
+	bool operator==(const RakString& rhs) const;
 	bool operator==(const char *str) const;
-	bool operator==(char *str) const;
+	friend bool operator==(const char *lhs, const RakString& rhs)
+	{
+		return rhs == lhs;
+	}
 
 	// Comparison
-	bool operator < ( const RakString& right ) const;
-	bool operator <= ( const RakString& right ) const;
-	bool operator > ( const RakString& right ) const;
-	bool operator >= ( const RakString& right ) const;
+	bool operator<(const RakString& right) const;
+	bool operator<=(const RakString& right) const;
+	bool operator>(const RakString& right) const;
+	bool operator>=(const RakString& right) const;
 
 	/// Inequality
-	bool operator!=(const RakString &rhs) const;
-	bool operator!=(const char *str) const;
-	bool operator!=(char *str) const;
+	bool operator!=(const RakString& rhs) const
+	{
+		return !(*this == rhs);
+	}
+	bool operator!=(const char *str) const
+	{
+		return !(*this == str);
+	}
+	friend bool operator!=(const char *lhs, const RakString& rhs)
+	{
+		return !(rhs == lhs);
+	}
 
 	/// Change all characters to lowercase
-	const char * ToLower(void);
+	const char *ToLower();
 
 	/// Change all characters to uppercase
-	const char * ToUpper(void);
+	const char *ToUpper();
 
 	/// Set the value of the string
 	void Set(const char *format, ...);
 
-	/// Sets a copy of a substring of str as the new content. The substring is the portion of str 
-	/// that begins at the character position pos and takes up to n characters 
+	/// Sets a copy of a substring of str as the new content. The substring is the portion of str
+	/// that begins at the character position pos and takes up to n characters
 	/// (it takes less than n if the end of str is reached before).
 	/// \param[in] str The string to copy in
 	/// \param[in] pos The position on str to start the copy
 	/// \param[in] n How many chars to copy
 	/// \return Returns the string, note that the current string is set to that value as well
-	RakString Assign(const char *str,size_t pos, size_t n );
+	RakString Assign(const char *str, size_t pos, size_t n);
 
 	/// Returns if the string is empty. Also, C_String() would return ""
-	bool IsEmpty(void) const;
+	bool IsEmpty() const
+	{
+		return sharedString == &emptyString;
+	}
 
 	/// Returns the length of the string
-	size_t GetLength(void) const;
-	size_t GetLengthUTF8(void) const;
+	size_t GetLength() const;
+	size_t GetLengthUTF8() const;
 
 	/// Replace character(s) in starting at index, for count, with c
-	void Replace(unsigned index, unsigned count, unsigned char c);
+	void Replace(unsigned int index, unsigned count, unsigned char c);
 
 	/// Replace character at index with c
-	void SetChar( unsigned index, unsigned char c );
+	void SetChar(size_t index, unsigned char c);
 
 	/// Replace character at index with string s
-	void SetChar( unsigned index, SLNet::RakString s );
+	void SetChar(size_t index, const SLNet::RakString& s);
 
-	/// Make sure string is no longer than \a length
-	void Truncate(unsigned int length);
-	void TruncateUTF8(unsigned int length);
+	/// Make sure string is not longer than length
+	void Truncate(size_t length);
+	void TruncateUTF8(size_t length);
 
-	// Gets the substring starting at index for count characters
-	RakString SubStr(unsigned int index, size_t count) const;
+	// Gets the substring starting at index for min(count, length)
+	RakString SubStr(size_t index, size_t count = (size_t)-1) const;
 
 	/// Erase characters out of the string at index for count
 	void Erase(unsigned int index, unsigned int count);
 
-	/// Set the first instance of c with a null-terminator
+	/// Set the first instance of c with a nullterminator
 	void TerminateAtFirstCharacter(char c);
 	/// Set the last instance of c with a null-terminator
 	void TerminateAtLastCharacter(char c);
@@ -165,18 +190,17 @@ public:
 	void StartAfterLastCharacter(char c);
 
 	/// Returns how many occurances there are of \a c in the string
-	int GetCharacterCount(char c);
-	
+	int GetCharacterCount(char c) const;
+
 	/// Remove all instances of c
 	void RemoveCharacter(char c);
 
-	/// Create a RakString with a value, without doing printf style parsing
-	/// Equivalent to assignment operator
+	/// Equivalent to constructor
 	static SLNet::RakString NonVariadic(const char *str);
 
 	/// Hash the string into an unsigned int
 	static unsigned long ToInteger(const char *str);
-	static unsigned long ToInteger(const RakString &rs);
+	static unsigned long ToInteger(const RakString& rs);
 
 	/// \brief Read an integer out of a substring
 	/// \param[in] str The string
@@ -188,70 +212,70 @@ public:
 	void AppendBytes(const char *bytes, size_t count);
 
 	/// Compare strings (case sensitive)
-	int StrCmp(const RakString &rhs) const;
+	int StrCmp(const RakString& rhs) const;
 
 	/// Compare strings (case sensitive), up to num characters
-	int StrNCmp(const RakString &rhs, size_t num) const;
+	int StrNCmp(const RakString& rhs, size_t num) const;
 
 	/// Compare strings (not case sensitive)
-	int StrICmp(const RakString &rhs) const;
+	int StrICmp(const RakString& rhs) const;
 
 	/// Clear the string
-	void Clear(void);
+	void Clear();
 
 	/// Print the string to the screen
-	void Printf(void);
+	void Printf() const;
 
 	/// Print the string to a file
-	void FPrintf(FILE *fp);
+	void FPrintf(FILE *fp) const;
 
 	/// Does the given IP address match the IP address encoded into this string, accounting for wildcards?
-	bool IPAddressMatch(const char *IP);
+	bool IPAddressMatch(const char *IP) const;
 
 	/// Does the string contain non-printable characters other than spaces?
-	bool ContainsNonprintableExceptSpaces(void) const;
+	bool ContainsNonprintableExceptSpaces() const;
 
 	/// Is this a valid email address?
-	bool IsEmailAddress(void) const;
+	bool IsEmailAddress() const;
 
 	/// URL Encode the string. See http://www.codeguru.com/cpp/cpp/cpp_mfc/article.php/c4029/
-	SLNet::RakString& URLEncode(void);
+	SLNet::RakString& URLEncode();
 
 	/// URL decode the string
-	SLNet::RakString& URLDecode(void);
+	SLNet::RakString& URLDecode();
 
 	/// https://servers.api.rackspacecloud.com/v1.0 to https://,  servers.api.rackspacecloud.com, /v1.0
-	void SplitURI(SLNet::RakString &header, SLNet::RakString &domain, SLNet::RakString &path);
+	void SplitURI(SLNet::RakString& header, SLNet::RakString& domain, SLNet::RakString& path);
 
 	/// Scan for quote, double quote, and backslash and prepend with backslash
-	SLNet::RakString& SQLEscape(void);
+	SLNet::RakString& SQLEscape();
 
 	/// Format as a POST command that can be sent to a webserver
 	/// \param[in] uri For example, masterserver2.raknet.com/testServer
 	/// \param[in] contentType For example, text/plain; charset=UTF-8
 	/// \param[in] body Body of the post
 	/// \return Formatted string
-	static SLNet::RakString FormatForPOST(const char* uri, const char* contentType, const char* body, const char* extraHeaders="");
-	static SLNet::RakString FormatForPUT(const char* uri, const char* contentType, const char* body, const char* extraHeaders="");
+	static SLNet::RakString FormatForPOST(const char* uri, const char* contentType, const char* body, const char* extraHeaders = "");
+	static SLNet::RakString FormatForPUT(const char* uri, const char* contentType, const char* body, const char* extraHeaders = "");
 
 	/// Format as a GET command that can be sent to a webserver
 	/// \param[in] uri For example, masterserver2.raknet.com/testServer?__gameId=comprehensivePCGame
 	/// \return Formatted string
-	static SLNet::RakString FormatForGET(const char* uri, const char* extraHeaders="");
+	static SLNet::RakString FormatForGET(const char* uri, const char* extraHeaders = "");
 
 	/// Format as a DELETE command that can be sent to a webserver
 	/// \param[in] uri For example, masterserver2.raknet.com/testServer?__gameId=comprehensivePCGame&__rowId=1
 	/// \return Formatted string
-	static SLNet::RakString FormatForDELETE(const char* uri, const char* extraHeaders="");
+	static SLNet::RakString FormatForDELETE(const char* uri, const char* extraHeaders = "");
 
 	/// Fix to be a file path, ending with /
-	SLNet::RakString& MakeFilePath(void);
+	SLNet::RakString& MakeFilePath();
 
 	/// RakString uses a freeList of old no-longer used strings
 	/// Call this function to clear this memory on shutdown
-	static void FreeMemory(void);
+	static void FreeMemory();
 	/// \internal
-	static void FreeMemoryNoMutex(void);
+	static void FreeMemoryNoMutex();
 
 	/// Serialize to a bitstream, uncompressed (slightly faster)
 	/// \param[out] bs Bitstream to serialize to
@@ -265,10 +289,10 @@ public:
 	/// \param[in] languageId languageId to pass to the StringCompressor class
 	/// \param[in] writeLanguageId encode the languageId variable in the stream. If false, 0 is assumed, and DeserializeCompressed will not look for this variable in the stream (saves bandwidth)
 	/// \pre StringCompressor::AddReference must have been called to instantiate the class (Happens automatically from RakPeer::Startup())
-	void SerializeCompressed(BitStream *bs, uint8_t languageId=0, bool writeLanguageId=false) const;
+	void SerializeCompressed(BitStream *bs, uint8_t languageId = 0, bool writeLanguageId = false) const;
 
 	/// Static version of the SerializeCompressed function
-	static void SerializeCompressed(const char *str, BitStream *bs, uint8_t languageId=0, bool writeLanguageId=false);
+	static void SerializeCompressed(const char *str, BitStream *bs, uint8_t languageId = 0, bool writeLanguageId = false);
 
 	/// Deserialize what was written by Serialize
 	/// \param[in] bs Bitstream to serialize from
@@ -283,10 +307,10 @@ public:
 	/// \param[in] readLanguageId If true, looks for the variable langaugeId in the data stream. Must match what was passed to SerializeCompressed
 	/// \return true if the deserialization was successful
 	/// \pre StringCompressor::AddReference must have been called to instantiate the class (Happens automatically from RakPeer::Startup())
-	bool DeserializeCompressed(BitStream *bs, bool readLanguageId=false);
+	bool DeserializeCompressed(BitStream *bs, bool readLanguageId = false);
 
 	/// Static version of the DeserializeCompressed() function
-	static bool DeserializeCompressed(char *str, BitStream *bs, bool readLanguageId=false);
+	static bool DeserializeCompressed(char *str, BitStream *bs, bool readLanguageId = false);
 
 	static const char *ToString(int64_t i);
 	static const char *ToString(uint64_t i);
@@ -294,11 +318,11 @@ public:
 	/// \internal
 	static size_t GetSizeToAllocate(size_t bytes)
 	{
-		const size_t smallStringSize = 128-sizeof(unsigned int)-sizeof(size_t)-sizeof(char*)*2;
-		if (bytes<=smallStringSize)
+		const size_t smallStringSize = 128 - sizeof(unsigned int) - sizeof(size_t) - sizeof(char*) * 2;
+		if(bytes <= smallStringSize)
 			return smallStringSize;
 		else
-			return bytes*2;
+			return bytes * 2;
 	}
 
 	/// \internal
@@ -309,18 +333,18 @@ public:
 		size_t bytesUsed;
 		char *bigString;
 		char *c_str;
-		char smallString[128-sizeof(unsigned int)-sizeof(size_t)-sizeof(char*)*2];		
+		char smallString[128 - sizeof(unsigned int) - sizeof(size_t) - sizeof(char*) * 2];
 	};
 
 	/// \internal
-	RakString( SharedString *_sharedString );
+	RakString(SharedString *_sharedString);
 
 	/// \internal
 	SharedString *sharedString;
 
-//	static SimpleMutex poolMutex;
-//	static DataStructures::MemoryPool<SharedString> pool;
-	/// \internal
+	//	static SimpleMutex poolMutex;
+	//	static DataStructures::MemoryPool<SharedString> pool;
+		/// \internal
 	static SharedString emptyString;
 
 	//static SharedString *sharedStringFreeList;
@@ -329,26 +353,26 @@ public:
 	/// List of free objects to reduce memory reallocations
 	static DataStructures::List<SharedString*> freeList;
 
-	static int RakStringComp( RakString const &key, RakString const &data );
+	static int RakStringComp(const RakString& key, const RakString& data);
 
-	static void LockMutex(void);
-	static void UnlockMutex(void);
+	static void LockMutex();
+	static void UnlockMutex();
 
 protected:
 	static SLNet::RakString FormatForPUTOrPost(const char* type, const char* uri, const char* contentType, const char* body, const char* extraHeaders);
 	void Allocate(size_t len);
 	void Assign(const char *str);
 	void Assign(const char *str, va_list ap);
-	
-	void Clone(void);
-	void Free(void);
-	unsigned char ToLower(unsigned char c);
-	unsigned char ToUpper(unsigned char c);
+
+	void Clone();
+	void Free();
+	static unsigned char ToLower(unsigned char c);
+	static unsigned char ToUpper(unsigned char c);
 	void Realloc(SharedString *inSharedString, size_t bytes);
 };
 
 }
 
-const SLNet::RakString RAK_DLL_EXPORT operator+(const SLNet::RakString &lhs, const SLNet::RakString &rhs);
+SLNet::RakString RAK_DLL_EXPORT operator+(const SLNet::RakString& lhs, const SLNet::RakString& rhs);
 
 #endif

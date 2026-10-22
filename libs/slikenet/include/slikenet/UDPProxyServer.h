@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief A RakNet plugin performing networking to communicate with UDPProxyServer. It allows UDPProxyServer to control our instance of UDPForwarder.
-///
+ /// \file
+ /// \brief A RakNet plugin performing networking to communicate with UDPProxyServer. It allows UDPProxyServer to control our instance of UDPForwarder.
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -38,29 +38,33 @@ class UDPProxyServer;
 /// \ingroup UDP_PROXY_GROUP
 struct UDPProxyServerResultHandler
 {
-	UDPProxyServerResultHandler() {}
-	virtual ~UDPProxyServerResultHandler() {}
+	UDPProxyServerResultHandler()
+	{
+	}
+	virtual ~UDPProxyServerResultHandler()
+	{
+	}
 
 	/// Called when our login succeeds
 	/// \param[out] usedPassword The password we passed to UDPProxyServer::LoginToCoordinator()
 	/// \param[out] proxyServer The plugin calling this callback
-	virtual void OnLoginSuccess(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)=0;
+	virtual void OnLoginSuccess(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin) = 0;
 
 	/// We are already logged in.
 	/// This login failed, but the system is operational as if it succeeded
 	/// \param[out] usedPassword The password we passed to UDPProxyServer::LoginToCoordinator()
 	/// \param[out] proxyServer The plugin calling this callback
-	virtual void OnAlreadyLoggedIn(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)=0;
+	virtual void OnAlreadyLoggedIn(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin) = 0;
 
 	/// The coordinator operator forgot to call UDPProxyCoordinator::SetRemoteLoginPassword()
 	/// \param[out] usedPassword The password we passed to UDPProxyServer::LoginToCoordinator()
 	/// \param[out] proxyServer The plugin calling this callback
-	virtual void OnNoPasswordSet(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)=0;
+	virtual void OnNoPasswordSet(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin) = 0;
 
 	/// The coordinator operator set a different password in UDPProxyCoordinator::SetRemoteLoginPassword() than what we passed
 	/// \param[out] usedPassword The password we passed to UDPProxyServer::LoginToCoordinator()
 	/// \param[out] proxyServer The plugin calling this callback
-	virtual void OnWrongPassword(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)=0;
+	virtual void OnWrongPassword(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin) = 0;
 };
 
 /// \brief UDPProxyServer to control our instance of UDPForwarder
@@ -74,11 +78,11 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(UDPProxyServer)
 
-	UDPProxyServer();
+		UDPProxyServer();
 	~UDPProxyServer();
 
 	/// Sets the socket family to use, either IPV4 or IPV6
-	/// \param[in] socketFamily For IPV4, use AF_INET (default). For IPV6, use AF_INET6. To autoselect, use AF_UNSPEC.
+	/// \param[in] socketFamily For IPV4, use AF_INET (default). For IPV6, use AF_INET6. For dual stack, use AF_UNSPEC.
 	void SetSocketFamily(unsigned short _socketFamily);
 
 	/// Receives the results of calling LoginToCoordinator()
@@ -108,7 +112,7 @@ public:
 	/// \internal
 	virtual void Update(void);
 	virtual PluginReceiveResult OnReceive(Packet *packet);
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 	virtual void OnRakPeerStartup(void);
 	virtual void OnRakPeerShutdown(void);
 

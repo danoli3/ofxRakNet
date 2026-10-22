@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief This will write all incoming and outgoing network messages to the local console screen.  See derived functions for other outputs
-///
+ /// \file
+ /// \brief This will write all incoming and outgoing network messages to the local console screen.  See derived functions for other outputs
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -47,7 +47,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(PacketLogger)
 
-	PacketLogger();
+		PacketLogger();
 	virtual ~PacketLogger();
 
 	// Translate the supplied parameters into an output line - overloaded version that takes a MessageIdentifier
@@ -100,7 +100,10 @@ public:
 	void SetLogDirectMessages(bool send);
 protected:
 
-	virtual bool UsesReliabilityLayer(void) const {return true;}
+	virtual bool UsesReliabilityLayer(void) const
+	{
+		return true;
+	}
 	const char* IDTOString(unsigned char Id);
 	virtual void AddToLog(const char *str);
 	// Users should override this

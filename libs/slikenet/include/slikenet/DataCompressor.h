@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,10 +13,10 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file DataCompressor.h
-/// \brief DataCompressor does compression on a block of data.  
-/// \details Not very good compression, but it's small and fast so is something you can use per-message at runtime.
-///
+ /// \file DataCompressor.h
+ /// \brief DataCompressor does compression on a block of data.  
+ /// \details Not very good compression, but it's small and fast so is something you can use per-message at runtime.
+ ///
 
 
 #ifndef __DATA_COMPRESSOR_H
@@ -36,8 +36,8 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(DataCompressor)
 
-	static void Compress( unsigned char *userData, unsigned sizeInBytes, SLNet::BitStream * output );
-	static unsigned DecompressAndAllocate(SLNet::BitStream * input, unsigned char **output );
+	static void Compress(unsigned char *userData, unsigned sizeInBytes, SLNet::BitStream * output);
+	static unsigned DecompressAndAllocate(SLNet::BitStream * input, unsigned char **output);
 };
 
 } // namespace SLNet

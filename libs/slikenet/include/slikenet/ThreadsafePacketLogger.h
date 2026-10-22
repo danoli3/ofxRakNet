@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief Derivation of the packet logger to defer the call to WriteLog until the user thread.
-///
+ /// \file
+ /// \brief Derivation of the packet logger to defer the call to WriteLog until the user thread.
+ ///
 
 
 #include "NativeFeatureIncludes.h"

@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief Contains the NAT-punchthrough plugin for the client.
-///
+ /// \file
+ /// \brief Contains the NAT-punchthrough plugin for the client.
+ ///
 
 #include "NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_NatPunchthroughClient==1
@@ -55,18 +55,19 @@ struct RAK_DLL_EXPORT PunchthroughConfiguration
 	/// internal: (15 ms * 2 tries + 30 wait) * 5 ports * 8 players = 2.4 seconds
 	/// external: (50 ms * 8 sends + 200 wait) * 2 port * 8 players = 9.6 seconds
 	/// Total: 8 seconds
-	PunchthroughConfiguration() {
-		TIME_BETWEEN_PUNCH_ATTEMPTS_INTERNAL=15;
-		TIME_BETWEEN_PUNCH_ATTEMPTS_EXTERNAL=50;
-		UDP_SENDS_PER_PORT_INTERNAL=2;
-		UDP_SENDS_PER_PORT_EXTERNAL=8;
-		INTERNAL_IP_WAIT_AFTER_ATTEMPTS=30;
-		MAXIMUM_NUMBER_OF_INTERNAL_IDS_TO_CHECK=5; /// set to 0 to not do lan connects
-		MAX_PREDICTIVE_PORT_RANGE=2;
-		EXTERNAL_IP_WAIT_BETWEEN_PORTS=200;
-		EXTERNAL_IP_WAIT_AFTER_FIRST_TTL=100;
-		EXTERNAL_IP_WAIT_AFTER_ALL_ATTEMPTS=EXTERNAL_IP_WAIT_BETWEEN_PORTS;
-		retryOnFailure=false;
+	PunchthroughConfiguration()
+	{
+		TIME_BETWEEN_PUNCH_ATTEMPTS_INTERNAL = 15;
+		TIME_BETWEEN_PUNCH_ATTEMPTS_EXTERNAL = 50;
+		UDP_SENDS_PER_PORT_INTERNAL = 2;
+		UDP_SENDS_PER_PORT_EXTERNAL = 8;
+		INTERNAL_IP_WAIT_AFTER_ATTEMPTS = 30;
+		MAXIMUM_NUMBER_OF_INTERNAL_IDS_TO_CHECK = 5; /// set to 0 to not do lan connects
+		MAX_PREDICTIVE_PORT_RANGE = 2;
+		EXTERNAL_IP_WAIT_BETWEEN_PORTS = 200;
+		EXTERNAL_IP_WAIT_AFTER_FIRST_TTL = 100;
+		EXTERNAL_IP_WAIT_AFTER_ALL_ATTEMPTS = EXTERNAL_IP_WAIT_BETWEEN_PORTS;
+		retryOnFailure = false;
 	}
 
 	/// How much time between each UDP send
@@ -105,9 +106,13 @@ struct RAK_DLL_EXPORT PunchthroughConfiguration
 /// \ingroup NAT_PUNCHTHROUGH_GROUP
 struct RAK_DLL_EXPORT NatPunchthroughDebugInterface
 {
-	NatPunchthroughDebugInterface() {}
-	virtual ~NatPunchthroughDebugInterface() {}
-	virtual void OnClientMessage(const char *msg)=0;
+	NatPunchthroughDebugInterface()
+	{
+	}
+	virtual ~NatPunchthroughDebugInterface()
+	{
+	}
+	virtual void OnClientMessage(const char *msg) = 0;
 };
 
 /// \ingroup NAT_PUNCHTHROUGH_GROUP
@@ -123,8 +128,13 @@ struct RAK_DLL_EXPORT NatPunchthroughDebugInterface_PacketLogger : public NatPun
 	// Set to non-zero to write to the packetlogger!
 	PacketLogger *pl;
 
-	NatPunchthroughDebugInterface_PacketLogger() {pl=0;}
-	~NatPunchthroughDebugInterface_PacketLogger() {}
+	NatPunchthroughDebugInterface_PacketLogger()
+	{
+		pl = 0;
+	}
+	~NatPunchthroughDebugInterface_PacketLogger()
+	{
+	}
 	virtual void OnClientMessage(const char *msg);
 };
 #endif
@@ -143,7 +153,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(NatPunchthroughClient)
 
-	NatPunchthroughClient();
+		NatPunchthroughClient();
 	~NatPunchthroughClient();
 
 	/// If the instance of RakPeer running NATPunchthroughServer was bound to two IP addresses, then you can call FindRouterPortStride()
@@ -193,7 +203,7 @@ public:
 	virtual void OnNewConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
 
 	/// \internal For plugin handling
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 
 	virtual void OnAttach(void);
 	virtual void OnDetach(void);

@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,8 +13,8 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-// Defines kept here for backwards compatibility with RAKNET 4.081/4.082.
-// Usage of these defines is deprecated. Please switch to using SLIKENET version defines.
+ // Defines kept here for backwards compatibility with RAKNET 4.081/4.082.
+ // Usage of these defines is deprecated. Please switch to using SLIKENET version defines.
 #define RAKNET_VERSION "4.082"
 #define RAKNET_VERSION_NUMBER 4.082
 #define RAKNET_VERSION_NUMBER_INT 4082

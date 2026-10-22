@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file CloudClient.h
-/// \brief Queries CloudMemoryServer to download data that other clients have uploaded
-///
+ /// \file CloudClient.h
+ /// \brief Queries CloudMemoryServer to download data that other clients have uploaded
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -106,7 +106,7 @@ public:
 	/// \param[in] packet Packet structure returned from RakPeerInterface
 	/// \param[in] _callback Callback to be called from the function containing output parameters. If 0, default is used.
 	/// \param[in] _allocator Allocator to be used to allocate data. If 0, default is used.
-	virtual void OnGetReponse(Packet *packet, CloudClientCallback *_callback=0, CloudAllocator *_allocator=0);
+	virtual void OnGetReponse(Packet *packet, CloudClientCallback *_callback = 0, CloudAllocator *_allocator = 0);
 
 	/// \brief Call this when you get ID_CLOUD_GET_RESPONSE
 	/// Different form of OnGetReponse that returns to a structure that you pass, instead of using a callback
@@ -115,14 +115,14 @@ public:
 	/// \param[out] cloudQueryResult A pointer to a structure that will be filled out with data
 	/// \param[in] packet Packet structure returned from RakPeerInterface
 	/// \param[in] _allocator Allocator to be used to allocate data. If 0, default is used.
-	virtual void OnGetReponse(CloudQueryResult *cloudQueryResult, Packet *packet, CloudAllocator *_allocator=0);
+	virtual void OnGetReponse(CloudQueryResult *cloudQueryResult, Packet *packet, CloudAllocator *_allocator = 0);
 
 	/// \brief Call this when you get ID_CLOUD_SUBSCRIPTION_NOTIFICATION
 	/// If \a callback or \a allocator are 0, the default callbacks passed to SetDefaultCallbacks() are used
 	/// \param[in] packet Packet structure returned from RakPeerInterface
 	/// \param[in] _callback Callback to be called from the function containing output parameters. If 0, default is used.
 	/// \param[in] _allocator Allocator to be used to allocate data. If 0, default is used.
-	virtual void OnSubscriptionNotification(Packet *packet, CloudClientCallback *_callback=0, CloudAllocator *_allocator=0);
+	virtual void OnSubscriptionNotification(Packet *packet, CloudClientCallback *_callback = 0, CloudAllocator *_allocator = 0);
 
 	/// \brief Call this when you get ID_CLOUD_SUBSCRIPTION_NOTIFICATION
 	/// Different form of OnSubscriptionNotification that returns to a structure that you pass, instead of using a callback
@@ -132,7 +132,7 @@ public:
 	/// \param[out] row A pointer to a structure that will be filled out with data
 	/// \param[in] packet Packet structure returned from RakPeerInterface
 	/// \param[in] _allocator Allocator to be used to allocate data. If 0, default is used.
-	virtual void OnSubscriptionNotification(bool *wasUpdated, CloudQueryRow *row, Packet *packet, CloudAllocator *_allocator=0);
+	virtual void OnSubscriptionNotification(bool *wasUpdated, CloudQueryRow *row, Packet *packet, CloudAllocator *_allocator = 0);
 
 	/// If you never specified an allocator, and used the non-callback form of OnGetReponse(), deallocate cloudQueryResult with this function
 	virtual void DeallocateWithDefaultAllocator(CloudQueryResult *cloudQueryResult);
@@ -154,19 +154,29 @@ protected:
 class RAK_DLL_EXPORT CloudClientCallback
 {
 public:
-	CloudClientCallback() {}
-	virtual ~CloudClientCallback() {}
+	CloudClientCallback()
+	{
+	}
+	virtual ~CloudClientCallback()
+	{
+	}
 
 	/// \brief Called in response to ID_CLOUD_GET_RESPONSE
 	/// \param[out] result Contains the original query passed to Get(), and a list of rows returned.
 	/// \param[out] deallocateRowsAfterReturn CloudQueryResult::rowsReturned will be deallocated after the function returns by default. Set to false to not deallocate these pointers. The pointers are allocated through CloudAllocator.
-	virtual void OnGet(SLNet::CloudQueryResult *result, bool *deallocateRowsAfterReturn) {(void) result; (void) deallocateRowsAfterReturn;}
+	virtual void OnGet(SLNet::CloudQueryResult *result, bool *deallocateRowsAfterReturn)
+	{
+		(void)result; (void)deallocateRowsAfterReturn;
+	}
 
 	/// \brief Called in response to ID_CLOUD_SUBSCRIPTION_NOTIFICATION
 	/// \param[out] result Contains the row updated
 	/// \param[out] wasUpdated If true, the row was updated. If false, it was deleted. \a result will contain the last value just before deletion
 	/// \param[out] deallocateRowAfterReturn \a result will be deallocated after the function returns by default. Set to false to not deallocate these pointers. The pointers are allocated through CloudAllocator.
-	virtual void OnSubscriptionNotification(SLNet::CloudQueryRow *result, bool wasUpdated, bool *deallocateRowAfterReturn) {(void) result; (void) wasUpdated; (void) deallocateRowAfterReturn;}
+	virtual void OnSubscriptionNotification(SLNet::CloudQueryRow *result, bool wasUpdated, bool *deallocateRowAfterReturn)
+	{
+		(void)result; (void)wasUpdated; (void)deallocateRowAfterReturn;
+	}
 };
 
 } // namespace SLNet

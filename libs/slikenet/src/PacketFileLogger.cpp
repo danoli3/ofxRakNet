@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,26 +13,25 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "slikenet/NativeFeatureIncludes.h"
+#include <slikenet/NativeFeatureIncludes.h>
 #if _RAKNET_SUPPORT_PacketLogger==1
 
-#include "slikenet/PacketFileLogger.h"
-#include "slikenet/GetTime.h"
-#include "slikenet/linux_adapter.h"
-#include "slikenet/osx_adapter.h"
-#include "slikenet/memoryoverride.h"
+#include <slikenet/PacketFileLogger.h>
+#include <slikenet/GetTime.h>
+#include <slikenet/crtstring_adapter.h>
+#include <slikenet/memoryoverride.h>
 
 using namespace SLNet;
 
-STATIC_FACTORY_DEFINITIONS(PacketFileLogger,PacketFileLogger);
+STATIC_FACTORY_DEFINITIONS(PacketFileLogger, PacketFileLogger);
 
 PacketFileLogger::PacketFileLogger()
 {
-	packetLogFile=0;
+	packetLogFile = 0;
 }
 PacketFileLogger::~PacketFileLogger()
 {
-	if (packetLogFile)
+	if(packetLogFile)
 	{
 		fflush(packetLogFile);
 		fclose(packetLogFile);
@@ -42,13 +41,13 @@ void PacketFileLogger::StartLog(const char *filenamePrefix)
 {
 	// Open file for writing
 	char filename[256];
-	if (filenamePrefix)
+	if(filenamePrefix)
 		sprintf_s(filename, "%s_%i.csv", filenamePrefix, (int)SLNet::GetTimeMS());
 	else
 		sprintf_s(filename, "PacketLog_%i.csv", (int)SLNet::GetTimeMS());
-	errno_t error = fopen_s(&packetLogFile, filename, "wt");
+	packetLogFile = fopen(filename, "wt");
 	LogHeader();
-	if (error == 0)
+	if(packetLogFile)
 	{
 		fflush(packetLogFile);
 	}
@@ -56,7 +55,7 @@ void PacketFileLogger::StartLog(const char *filenamePrefix)
 
 void PacketFileLogger::WriteLog(const char *str)
 {
-	if (packetLogFile)
+	if(packetLogFile)
 	{
 		fprintf(packetLogFile, "%s\n", str);
 		fflush(packetLogFile);

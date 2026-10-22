@@ -3,13 +3,13 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  */
 
-// If you want to change these defines, put them in NativeFeatureIncludesOverrides so your changes are not lost when updating RakNet
-// The user should not edit this file
+ // If you want to change these defines, put them in NativeFeatureIncludesOverrides so your changes are not lost when updating RakNet
+ // The user should not edit this file
 #include "NativeFeatureIncludesOverrides.h"
 
 #ifndef __NATIVE_FEATURE_INCLDUES_H

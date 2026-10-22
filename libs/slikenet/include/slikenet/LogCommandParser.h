@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief Contains LogCommandParser , Used to send logs to connected consoles
-///
+ /// \file
+ /// \brief Contains LogCommandParser , Used to send logs to connected consoles
+ ///
 
 #include "NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_LogCommandParser==1
@@ -38,7 +38,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(LogCommandParser)
 
-	LogCommandParser();
+		LogCommandParser();
 	~LogCommandParser();
 
 	/// Given \a command with parameters \a parameterList , do whatever processing you wish.

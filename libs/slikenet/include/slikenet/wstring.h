@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -26,99 +26,127 @@
 
 namespace SLNet
 {
-	/// \brief String class for Unicode
-	class RAK_DLL_EXPORT RakWString
+/// \brief String class for Unicode
+class RAK_DLL_EXPORT RakWString
+{
+public:
+	// Constructors
+	constexpr RakWString() = default;
+	RakWString(const RakString& right)
 	{
-	public:
-		// Constructors
-		RakWString();
-		RakWString( const RakString &right );
-		RakWString( const wchar_t *input );
-		RakWString( const RakWString & right);
-		RakWString( const char *input );
-		~RakWString();
+		*this = right;
+	}
+	RakWString(const wchar_t *input)
+	{
+		*this = input;
+	}
+	RakWString(const RakWString& right)
+	{
+		*this = right;
+	}
+	RakWString(RakWString&& right) noexcept;
+	RakWString(const char *input)
+	{
+		*this = input;
+	}
+	~RakWString();
 
-		/// Implicit return of wchar_t*
-		operator wchar_t* () const {if (c_str) return c_str; return (wchar_t*) L"";}
+#if USE_IMPLICIT_CONVERSIONS
+	/// Implicit conversion to const wchar_t*
+	operator const wchar_t*() const
+	{
+		return data;
+	}
+#endif
 
-		/// Same as std::string::c_str
-		const wchar_t* C_String(void) const {if (c_str) return c_str; return (const wchar_t*) L"";}
+	/// Same as std::string::c_str()
+	const wchar_t *C_String() const
+	{
+		return data;
+	}
 
-		/// Assignment operators
-		RakWString& operator = ( const RakWString& right );
-		RakWString& operator = ( const RakString& right );
-		RakWString& operator = ( const wchar_t * const str );
-		RakWString& operator = ( wchar_t *str );
-		RakWString& operator = ( const char * const str );
-		RakWString& operator = ( char *str );
+	/// Assignment operators
+	RakWString& operator=(const RakWString& right);
+	RakWString& operator=(RakWString&& right) noexcept;
+	RakWString& operator=(const RakString& right);
+	RakWString& operator=(const wchar_t *const str);
+	RakWString& operator=(const char *const str);
 
-		/// Concatenation
-		RakWString& operator +=( const RakWString& right);
-		RakWString& operator += ( const wchar_t * const right );
-		RakWString& operator += ( wchar_t *right );
+	/// Concatenation
+	RakWString& operator+=(const RakWString& right);
+	RakWString& operator+=(const wchar_t *const right);
 
-		/// Equality
-		bool operator==(const RakWString &right) const;
+	/// Equality
+	bool operator==(const RakWString &right) const;
 
-		// Comparison
-		bool operator < ( const RakWString& right ) const;
-		bool operator <= ( const RakWString& right ) const;
-		bool operator > ( const RakWString& right ) const;
-		bool operator >= ( const RakWString& right ) const;
+	// Comparison
+	bool operator<(const RakWString& right) const;
+	bool operator<=(const RakWString& right) const;
+	bool operator>(const RakWString& right) const;
+	bool operator>=(const RakWString& right) const;
 
-		/// Inequality
-		bool operator!=(const RakWString &right) const;
+	/// Inequality
+	bool operator!=(const RakWString& right) const;
 
-		/// Set the value of the string
-		void Set( wchar_t *str );
+	/// Set the value of the string
+	void Set(const wchar_t *str)
+	{
+		*this = str;
+	}
 
-		/// Returns if the string is empty. Also, C_String() would return ""
-		bool IsEmpty(void) const;
+	/// Returns if the string is empty. Also, C_String() would return ""
+	bool IsEmpty() const
+	{
+		return length == 0;
+	}
 
-		/// Returns the length of the string
-		size_t GetLength(void) const;
+	/// Returns the length of the string
+	size_t GetLength() const
+	{
+		return length;
+	}
 
-		/// Has the string into an unsigned int
-		static unsigned long ToInteger(const RakWString &rs);
+	/// Has the string into an unsigned int
+	static unsigned long ToInteger(const RakWString& rs);
 
-		/// Compare strings (case sensitive)
-		int StrCmp(const RakWString &right) const;
+	/// Compare strings (case sensitive)
+	int StrCmp(const RakWString& right) const;
 
-		/// Compare strings (not case sensitive)
-		int StrICmp(const RakWString &right) const;
+	/// Compare strings (not case sensitive)
+	int StrICmp(const RakWString& right) const;
 
-		/// Clear the string
-		void Clear(void);
+	/// Clear the string
+	void Clear();
 
-		/// Print the string to the screen
-		void Printf(void);
+	/// Print the string to the screen
+	void Printf();
 
-		/// Print the string to a file
-		void FPrintf(FILE *fp);
+	/// Print the string to a file
+	void FPrintf(FILE *fp);
 
-		/// Serialize to a bitstream, uncompressed (slightly faster)
-		/// \param[out] bs Bitstream to serialize to
-		void Serialize(BitStream *bs) const;
+	/// Serialize to a bitstream, uncompressed (slightly faster)
+	/// \param[out] bs Bitstream to serialize to
+	void Serialize(BitStream *bs) const;
 
-		/// Static version of the Serialize function
-		static void Serialize(const wchar_t * const str, BitStream *bs);
+	/// Static version of the Serialize function
+	static void Serialize(const wchar_t *const str, BitStream *bs);
 
-		/// Deserialize what was written by Serialize
-		/// \param[in] bs Bitstream to serialize from
-		/// \return true if the deserialization was successful
-		bool Deserialize(BitStream *bs);
+	/// Deserialize what was written by Serialize
+	/// \param[in] bs Bitstream to serialize from
+	/// \return true if the deserialization was successful
+	bool Deserialize(BitStream *bs);
 
-		/// Static version of the Deserialize() function
-		static bool Deserialize(wchar_t *str, BitStream *bs);
-		static bool Deserialize(wchar_t *str, size_t strLength, BitStream *bs);
+	/// Static version of the Deserialize() function
+	static bool Deserialize(wchar_t *str, BitStream *bs);
+	static bool Deserialize(wchar_t *str, size_t strLength, BitStream *bs);
 
 
-	protected:
-		wchar_t* c_str;
-		size_t c_strCharLength;
-	};
+protected:
+	wchar_t *data = nullptr;
+	size_t length = 0;
+};
 }
 
-const SLNet::RakWString RAK_DLL_EXPORT operator+(const SLNet::RakWString &lhs, const SLNet::RakWString &rhs);
+const SLNet::RakWString RAK_DLL_EXPORT operator+(const SLNet::RakWString& lhs, const SLNet::RakWString& rhs);
 
 #endif

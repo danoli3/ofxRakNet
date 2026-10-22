@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -15,61 +15,61 @@
 
 #if defined(_WIN32) && !defined(__GNUC__)  &&!defined(__GCCXML__)
 
-#include "slikenet/gettimeofday.h"
+#include <slikenet/gettimeofday.h>
 
-// From http://www.openasthra.com/c-tidbits/gettimeofday-function-for-windows/
+ // From http://www.openasthra.com/c-tidbits/gettimeofday-function-for-windows/
 
-#include "slikenet/WindowsIncludes.h"
+#include <slikenet/WindowsIncludes.h>
 
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-  #define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
 #else
-  #define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 #endif
 
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
 #if defined(WINDOWS_PHONE_8) || defined(WINDOWS_STORE_RT)
 	// _tzset not supported
-	(void) tv;
-	(void) tz;
+	(void)tv;
+	(void)tz;
 #else
 
-  FILETIME ft;
-  unsigned __int64 tmpres = 0;
-  static int tzflag;
+	FILETIME ft;
+	unsigned __int64 tmpres = 0;
+	static int tzflag;
 
-  if (nullptr != tv)
-  {
-    GetSystemTimeAsFileTime(&ft);
+	if(nullptr != tv)
+	{
+		GetSystemTimeAsFileTime(&ft);
 
-    tmpres |= ft.dwHighDateTime;
-    tmpres <<= 32;
-    tmpres |= ft.dwLowDateTime;
+		tmpres |= ft.dwHighDateTime;
+		tmpres <<= 32;
+		tmpres |= ft.dwLowDateTime;
 
-    /*converting file time to unix epoch*/
-    tmpres /= 10;  /*convert into microseconds*/
-    tmpres -= DELTA_EPOCH_IN_MICROSECS;
-    tv->tv_sec = (long)(tmpres / 1000000UL);
-    tv->tv_usec = (long)(tmpres % 1000000UL);
-  }
+		/*converting file time to unix epoch*/
+		tmpres /= 10;  /*convert into microseconds*/
+		tmpres -= DELTA_EPOCH_IN_MICROSECS;
+		tv->tv_sec = (long)(tmpres / 1000000UL);
+		tv->tv_usec = (long)(tmpres % 1000000UL);
+	}
 
-  if (nullptr != tz)
-  {
-    if (!tzflag)
-    {
-      _tzset();
-      tzflag++;
-    }
-	long seconds;
-	_get_timezone(&seconds);
-    tz->tz_minuteswest = seconds / 60;
-	_get_daylight(&(tz->tz_dsttime));
-  }
+	if(nullptr != tz)
+	{
+		if(!tzflag)
+		{
+			_tzset();
+			tzflag++;
+		}
+		long seconds;
+		_get_timezone(&seconds);
+		tz->tz_minuteswest = seconds / 60;
+		_get_daylight(&(tz->tz_dsttime));
+	}
 
 #endif
 
-  return 0;
+	return 0;
 }
 
 #endif

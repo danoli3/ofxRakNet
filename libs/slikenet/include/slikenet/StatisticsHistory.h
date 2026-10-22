@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,8 +13,8 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file StatisticsHistory.h
-/// \brief Input numerical values over time. Get sum, average, highest, lowest, standard deviation on recent or all-time values
+ /// \file StatisticsHistory.h
+ /// \brief Input numerical values over time. Get sum, average, highest, lowest, standard deviation on recent or all-time values
 
 
 #include "NativeFeatureIncludes.h"
@@ -23,16 +23,16 @@
 #ifndef __STATISTICS_HISTORY_H
 #define __STATISTICS_HISTORY_H
 
+#include <float.h>
+#include <slikenet/NativeTypes.h>
+#include <slikenet/string.h>
 #include "PluginInterface2.h"
 #include "memoryoverride.h"
-#include "NativeTypes.h"
 #include "DS_List.h"
 #include "types.h"
 #include "DS_OrderedList.h"
-#include "string.h"
 #include "DS_Queue.h"
 #include "DS_Hash.h"
-#include <float.h>
 
 namespace SLNet
 {
@@ -50,7 +50,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(StatisticsHistory)
 
-	enum SHErrorCode
+		enum SHErrorCode
 	{
 		SH_OK,
 		SH_UKNOWN_OBJECT,
@@ -165,16 +165,16 @@ public:
 		Time GetTimeRange(void) const;
 
 		// Merge two sets to output
-		static void MergeSets( const TimeAndValueQueue *lhs, SHDataCategory lhsDataCategory, const TimeAndValueQueue *rhs, SHDataCategory rhsDataCategory, TimeAndValueQueue *output );
+		static void MergeSets(const TimeAndValueQueue *lhs, SHDataCategory lhsDataCategory, const TimeAndValueQueue *rhs, SHDataCategory rhsDataCategory, TimeAndValueQueue *output);
 
 		// Shrink or expand a sample set to the approximate number given
 		// DC_DISCRETE will produce a histogram (sum) while DC_CONTINUOUS will produce an average
-		void ResizeSampleSet( int approximateSamples, DataStructures::Queue<StatisticsHistory::TimeAndValue> &blendedSamples, SHDataCategory dataCategory, Time timeClipStart=0, Time timeClipEnd=0 );
+		void ResizeSampleSet(int approximateSamples, DataStructures::Queue<StatisticsHistory::TimeAndValue> &blendedSamples, SHDataCategory dataCategory, Time timeClipStart = 0, Time timeClipEnd = 0);
 
 		// Clear out all values
 		void Clear(void);
 
-		TimeAndValueQueue& operator = ( const TimeAndValueQueue& input );
+		TimeAndValueQueue& operator = (const TimeAndValueQueue& input);
 
 		/// \internal
 		void CullExpiredValues(Time curTime);
@@ -187,7 +187,7 @@ public:
 protected:
 	struct TrackedObject;
 public:
-	static int TrackedObjectComp( const uint64_t &key, TrackedObject* const &data );
+	static int TrackedObjectComp(const uint64_t &key, TrackedObject* const &data);
 protected:
 
 	struct TrackedObject
@@ -198,7 +198,7 @@ protected:
 		DataStructures::Hash<SLNet::RakString, TimeAndValueQueue*, 32, SLNet::RakString::ToInteger> dataQueues;
 	};
 
-	DataStructures::OrderedList<uint64_t, TrackedObject*,TrackedObjectComp> objects;
+	DataStructures::OrderedList<uint64_t, TrackedObject*, TrackedObjectComp> objects;
 
 	Time timeToTrack;
 };
@@ -211,15 +211,15 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(StatisticsHistoryPlugin)
 
-	StatisticsHistory statistics;
+		StatisticsHistory statistics;
 
 	StatisticsHistoryPlugin();
 	virtual ~StatisticsHistoryPlugin();
 	void SetTrackConnections(bool _addNewConnections, int newConnectionsObjectType, bool _removeLostConnections);
-	
+
 protected:
 	virtual void Update(void);
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 	virtual void OnNewConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
 
 	// Too slow

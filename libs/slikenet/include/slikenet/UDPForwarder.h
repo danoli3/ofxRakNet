@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief Forwards UDP datagrams. Independent of RakNet's protocol.
-///
+ /// \file
+ /// \brief Forwards UDP datagrams. Independent of RakNet's protocol.
+ ///
 
 
 
@@ -34,7 +34,6 @@
 #include "thread.h"
 #include "DS_Queue.h"
 #include "DS_OrderedList.h"
-#include "LocklessTypes.h"
 #include "DS_ThreadsafeAllocatingQueue.h"
 
 namespace SLNet
@@ -61,10 +60,10 @@ public:
 
 	/// Starts the system.
 	/// Required to call before StartForwarding
-	void Startup(void);
+	void Startup();
 
 	/// Stops the system, and frees all sockets
-	void Shutdown(void);
+	void Shutdown();
 
 	/// Sets the maximum number of forwarding entries allowed
 	/// Set according to your available bandwidth and the estimated average bandwidth per forwarded address.
@@ -72,10 +71,10 @@ public:
 	void SetMaxForwardEntries(unsigned short maxEntries);
 
 	/// \return The \a maxEntries parameter passed to SetMaxForwardEntries(), or the default if it was never called
-	int GetMaxForwardEntries(void) const;
+	int GetMaxForwardEntries() const;
 
 	/// \return How many entries have been used
-	int GetUsedForwardEntries(void) const;
+	int GetUsedForwardEntries() const;
 
 	/// Forwards datagrams from source to destination, and vice-versa
 	/// Does nothing if this forward entry already exists via a previous call
@@ -84,8 +83,8 @@ public:
 	/// \param[in] source The source IP and port
 	/// \param[in] destination Where to forward to (and vice-versa)
 	/// \param[in] timeoutOnNoDataMS If no messages are forwarded for this many MS, then automatically remove this entry.
-	/// \param[in] forceHostAddress Force binding on a particular address. 0 to use any.
-	/// \param[in] socketFamily IP version: For IPV4, use AF_INET (default). For IPV6, use AF_INET6. To autoselect, use AF_UNSPEC.
+	/// \param[in] forceHostAddress Force binding on a particular address. nullptr to use any.
+	/// \param[in] socketFamily IP version: For IPV4, use AF_INET (default). For IPV6, use AF_INET6. For dual stack, use AF_UNSPEC and set \a forceHostAddress to nullptr.
 	/// \param[out] forwardingPort New opened port for forwarding
 	/// \param[out] forwardingSocket New opened socket for forwarding
 	/// \return UDPForwarderResult
@@ -115,7 +114,7 @@ public:
 protected:
 	friend RAK_THREAD_DECLARATION(UpdateUDPForwarderGlobal);
 
-	void UpdateUDPForwarder(void);
+	void UpdateUDPForwarder();
 	void RecvFrom(SLNet::TimeMS curTime, ForwardEntry *forwardEntry);
 
 	struct StartForwardingInputStruct
@@ -150,10 +149,11 @@ protected:
 
 	// New entries are added to forwardListNotUpdated
 	DataStructures::List<ForwardEntry*> forwardListNotUpdated;
-//	SimpleMutex forwardListNotUpdatedMutex;
+	//	SimpleMutex forwardListNotUpdatedMutex;
 
 	unsigned short maxForwardEntries;
-	SLNet::LocklessUint32_t isRunning, threadRunning;
+	volatile bool isRunning = false;
+	volatile bool threadRunning = false;
 
 };
 

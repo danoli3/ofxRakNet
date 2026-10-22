@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,18 +13,18 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief Contains HTTPConnection, used to communicate with web servers
-///
+ /// \file
+ /// \brief Contains HTTPConnection, used to communicate with web servers
+ ///
 
-#include "slikenet/NativeFeatureIncludes.h"
+#include <slikenet/NativeFeatureIncludes.h>
 #if _RAKNET_SUPPORT_HTTPConnection==1 && _RAKNET_SUPPORT_TCPInterface==1
 
-#include "slikenet/TCPInterface.h"
-#include "slikenet/HTTPConnection.h"
-#include "slikenet/sleep.h"
-#include "slikenet/string.h"
-#include "slikenet/assert.h"
+#include <slikenet/TCPInterface.h>
+#include <slikenet/HTTPConnection.h>
+#include <slikenet/sleep.h>
+#include <slikenet/string.h>
+#include <slikenet/assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -32,68 +32,67 @@
 
 using namespace SLNet;
 
-STATIC_FACTORY_DEFINITIONS(HTTPConnection,HTTPConnection);
+STATIC_FACTORY_DEFINITIONS(HTTPConnection, HTTPConnection);
 
 HTTPConnection::HTTPConnection() : connectionState(CS_NONE)
 {
-	tcp=0;
+	tcp = 0;
 }
 
 void HTTPConnection::Init(TCPInterface* _tcp, const char *_host, unsigned short _port)
 {
-	tcp=_tcp;
-	host=_host;
-	port=_port;
+	tcp = _tcp;
+	host = _host;
+	port = _port;
 }
 
 void HTTPConnection::Post(const char *remote_path, const char *data, const char *_contentType)
 {
 	OutgoingCommand op;
-	op.contentType=_contentType;
-	op.data=data;
-	op.remotePath=remote_path;
-	op.isPost=true;
-	outgoingCommand.Push(op, _FILE_AND_LINE_ );
+	op.contentType = _contentType;
+	op.data = data;
+	op.remotePath = remote_path;
+	op.isPost = true;
+	outgoingCommand.Push(op, _FILE_AND_LINE_);
 	//printf("Adding outgoing post\n");
 }
 
 void HTTPConnection::Get(const char *path)
 {
 	OutgoingCommand op;
-	op.remotePath=path;
-	op.isPost=false;
-	outgoingCommand.Push(op, _FILE_AND_LINE_ );
+	op.remotePath = path;
+	op.isPost = false;
+	outgoingCommand.Push(op, _FILE_AND_LINE_);
 }
 
 bool HTTPConnection::HasBadResponse(int *code, SLNet::RakString *data)
 {
-    if(badResponses.IsEmpty())
-        return false;
-
-	if (code)
+	if(badResponses.IsEmpty())
+		return false;
+	if(code)
 		*code = badResponses.Peek().code;
-	if (data)
+	if(data)
 		*data = badResponses.Pop().data;
-   return true;
+	return true;
 }
 void HTTPConnection::CloseConnection()
 {
-	connectionState=CS_DISCONNECTING;
+	connectionState = CS_DISCONNECTING;
 }
 void HTTPConnection::Update(void)
 {
 	SystemAddress sa;
 	sa = tcp->HasCompletedConnectionAttempt();
-	while (sa!=UNASSIGNED_SYSTEM_ADDRESS)
+	while(sa != UNASSIGNED_SYSTEM_ADDRESS)
 	{
-//		printf("Connected\n");
-		connectionState=CS_CONNECTED;
-		server=sa;
+		//		printf("Connected\n");
+		connectionState = CS_CONNECTED;
+		server = sa;
 		sa = tcp->HasCompletedConnectionAttempt();
 	}
 
 	sa = tcp->HasFailedConnectionAttempt();
-	while (sa!=UNASSIGNED_SYSTEM_ADDRESS)
+	while(sa != UNASSIGNED_SYSTEM_ADDRESS)
 	{
 		//printf("Failed connected\n");
 		CloseConnection();
@@ -101,7 +100,7 @@ void HTTPConnection::Update(void)
 	}
 
 	sa = tcp->HasLostConnection();
-	while (sa!=UNASSIGNED_SYSTEM_ADDRESS)
+	while(sa != UNASSIGNED_SYSTEM_ADDRESS)
 	{
 		//printf("Lost connection\n");
 		CloseConnection();
@@ -109,108 +108,108 @@ void HTTPConnection::Update(void)
 	}
 
 
-	switch (connectionState)
+	switch(connectionState)
 	{
 	case CS_NONE:
-		{
-			if (outgoingCommand.IsEmpty())
-				return;
+	{
+		if(outgoingCommand.IsEmpty())
+			return;
 
-			//printf("Connecting\n");
-			server = tcp->Connect(host, port, false);
-			connectionState = CS_CONNECTING;
-		}
-		break;
+		//printf("Connecting\n");
+		server = tcp->Connect(host.C_String(), port, false);
+		connectionState = CS_CONNECTING;
+	}
+	break;
 	case CS_DISCONNECTING:
+	{
+		if(tcp->ReceiveHasPackets() == false)
 		{
-			if (tcp->ReceiveHasPackets()==false)
+			if(incomingData.IsEmpty() == false)
 			{
-				if (incomingData.IsEmpty()==false)
-				{
-					results.Push(incomingData, _FILE_AND_LINE_ );
-				}
-				incomingData.Clear();
-				tcp->CloseConnection(server);
-				connectionState=CS_NONE;
+				results.Push(incomingData, _FILE_AND_LINE_);
 			}
-		}
-		break;
-	case CS_CONNECTING:
-		{
-		}
-		break;
-	case CS_CONNECTED:
-		{
-			//printf("Connected\n");
-			if (outgoingCommand.IsEmpty())
-			{
-				//printf("Closed connection (nothing to do)\n");
-				CloseConnection();
-				return;
-			}
-
-#if OPEN_SSL_CLIENT_SUPPORT==1
-			tcp->StartSSLClient(server);
-#endif
-
-			//printf("Sending request\n");
-			currentProcessingCommand = outgoingCommand.Pop();
-			RakString request;
-			if (currentProcessingCommand.isPost)
-			{
-				request.Set("POST %s HTTP/1.0\r\n"
-					"Host: %s:%i\r\n"
-					"Content-Type: %s\r\n"
-					"Content-Length: %u\r\n"
-					"\r\n"
-					"%s",
-					currentProcessingCommand.remotePath.C_String(),
-					host.C_String(),
-					port,
-					currentProcessingCommand.contentType.C_String(),
-					(unsigned) currentProcessingCommand.data.GetLength(),
-					currentProcessingCommand.data.C_String());
-			}
-			else
-			{
-				// request.Set("GET %s\r\n", host.C_String());
-				// http://www.jenkinssoftware.com/forum/index.php?topic=4601.0;topicseen
-				request.Set("GET %s HTTP/1.0\r\n"
-					"Host: %s:%i\r\n"
-					"\r\n",
-					currentProcessingCommand.remotePath.C_String(),
-					host.C_String(),
-					port);
-			}
-			
-		//	printf(request.C_String());
-	//		request.URLEncode();
-			tcp->Send(request.C_String(), (unsigned int) request.GetLength(), server,false);
-			connectionState=CS_PROCESSING;
-		}
-		break;
-	case CS_PROCESSING:
-		{
+			incomingData.Clear();
+			tcp->CloseConnection(server);
+			connectionState = CS_NONE;
 		}
 	}
+	break;
+	case CS_CONNECTING:
+	{
+	}
+	break;
+	case CS_CONNECTED:
+	{
+		//printf("Connected\n");
+		if(outgoingCommand.IsEmpty())
+		{
+			//printf("Closed connection (nothing to do)\n");
+			CloseConnection();
+			return;
+		}
 
-//	if (connectionState==CS_PROCESSING && currentProcessingCommand.data.IsEmpty()==false)
-//		outgoingCommand.PushAtHead(currentProcessingCommand);
+#if OPEN_SSL_CLIENT_SUPPORT==1
+		tcp->StartSSLClient(server);
+#endif
+
+		//printf("Sending request\n");
+		currentProcessingCommand = outgoingCommand.Pop();
+		RakString request;
+		if(currentProcessingCommand.isPost)
+		{
+			request.Set("POST %s HTTP/1.0\r\n"
+				"Host: %s:%i\r\n"
+				"Content-Type: %s\r\n"
+				"Content-Length: %u\r\n"
+				"\r\n"
+				"%s",
+				currentProcessingCommand.remotePath.C_String(),
+				host.C_String(),
+				port,
+				currentProcessingCommand.contentType.C_String(),
+				(unsigned)currentProcessingCommand.data.GetLength(),
+				currentProcessingCommand.data.C_String());
+		}
+		else
+		{
+			// request.Set("GET %s\r\n", host.C_String());
+			// http://www.jenkinssoftware.com/forum/index.php?topic=4601.0;topicseen
+			request.Set("GET %s HTTP/1.0\r\n"
+				"Host: %s:%i\r\n"
+				"\r\n",
+				currentProcessingCommand.remotePath.C_String(),
+				host.C_String(),
+				port);
+		}
+
+		//	printf(request.C_String());
+	//		request.URLEncode();
+		tcp->Send(request.C_String(), (unsigned int)request.GetLength(), server, false);
+		connectionState = CS_PROCESSING;
+	}
+	break;
+	case CS_PROCESSING:
+	{
+	}
+	}
+
+	//	if (connectionState==CS_PROCESSING && currentProcessingCommand.data.IsEmpty()==false)
+	//		outgoingCommand.PushAtHead(currentProcessingCommand);
 }
 bool HTTPConnection::HasRead(void) const
 {
-	return results.IsEmpty()==false;
+	return results.IsEmpty() == false;
 }
 RakString HTTPConnection::Read(void)
 {
-	if (results.IsEmpty())
+	if(results.IsEmpty())
 		return RakString();
 
 	SLNet::RakString resultStr = results.Pop();
-    // const char *start_of_body = strstr(resultStr.C_String(), "\r\n\r\n");
+	// const char *start_of_body = strstr(resultStr.C_String(), "\r\n\r\n");
 	const char *start_of_body = strpbrk(resultStr.C_String(), "\001\002\003%");
-    
-    if(start_of_body)
+
+	if(start_of_body)
 		return SLNet::RakString::NonVariadic(start_of_body);
 	else
 		return resultStr;
@@ -232,23 +231,23 @@ void HTTPConnection::ProcessTCPPacket(Packet *packet)
 
 			if(response_code > 299)
 			{
-				badResponses.Push(BadResponse(packet->data, response_code), _FILE_AND_LINE_ );
+				badResponses.Push(BadResponse(packet->data, response_code), _FILE_AND_LINE_);
 				//printf("Closed connection (Bad response 2)\n");
 				CloseConnection();
 				return;
 			}
 		}
 
-		SLNet::RakString incomingTemp = SLNet::RakString::NonVariadic((const char*) packet->data);
+		SLNet::RakString incomingTemp = SLNet::RakString::NonVariadic((const char*)packet->data);
 		incomingTemp.URLDecode();
 		incomingData += incomingTemp;
 
-	//	printf((const char*) packet->data);
-	//	printf("\n");
+		//	printf((const char*) packet->data);
+		//	printf("\n");
 
 		RakAssert(strlen((char *)packet->data) == packet->length); // otherwise it contains Null bytes
 
-		const char *start_of_body = strstr(incomingData, "\r\n\r\n");
+		const char *start_of_body = strstr(incomingData.C_String(), "\r\n\r\n");
 
 		// besides having the server close the connection, they may
 		// provide a length header and supply that many bytes
@@ -266,29 +265,29 @@ void HTTPConnection::ProcessTCPPacket(Packet *packet)
 			else
 			{
 			*/
-				long length_of_headers;
-				if (start_of_body)
+			long length_of_headers;
+			if(start_of_body)
+			{
+				length_of_headers = (long)(start_of_body + 4 - incomingData.C_String());
+				const char *length_header = strstr(incomingData.C_String(), "\r\nLength: ");
+
+				if(length_header)
 				{
-					length_of_headers = (long)(start_of_body + 4 - incomingData.C_String());
-					const char *length_header = strstr(incomingData, "\r\nLength: ");
+					long length = atol(length_header + 10) + length_of_headers;
 
-					if(length_header)
+					if((long)incomingData.GetLength() >= length)
 					{
-						long length = atol(length_header + 10) + length_of_headers;
-
-						if((long) incomingData.GetLength() >= length)
-						{
-							//printf("Closed connection (Got all data due to length header)\n");
-							CloseConnection();
-						}
+						//printf("Closed connection (Got all data due to length header)\n");
+						CloseConnection();
 					}
 				}
-				else
-				{
-					// No processing needed
-				}
+			}
+			else
+			{
+				// No processing needed
+			}
 
-				
+
 			//}
 		}
 	}
@@ -307,7 +306,7 @@ int HTTPConnection::GetState(void) const
 
 HTTPConnection::~HTTPConnection(void)
 {
-	if (tcp)
+	if(tcp)
 		tcp->CloseConnection(server);
 }
 

@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -14,7 +14,7 @@
  */
 
 #if   defined(_WIN32)
-#include "slikenet/WindowsIncludes.h" // Sleep
+#include <slikenet/WindowsIncludes.h> // Sleep
 
 
 
@@ -30,7 +30,7 @@ pthread_mutex_t fakeMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t fakeCond = PTHREAD_COND_INITIALIZER;
 #endif
 
-#include "slikenet/sleep.h"
+#include <slikenet/sleep.h>
 
 
 #if defined(WINDOWS_PHONE_8) || defined(WINDOWS_STORE_RT)
@@ -58,15 +58,15 @@ void RakSleep(unsigned int ms)
 
 	gettimeofday(&now, nullptr);
 
-	long seconds = ms/1000;
+	long seconds = ms / 1000;
 	long nanoseconds = (ms - seconds * 1000) * 1000000;
 	timeToWait.tv_sec = now.tv_sec + seconds;
-	timeToWait.tv_nsec = now.tv_usec*1000 + nanoseconds;
-	
-	if (timeToWait.tv_nsec >= 1000000000)
+	timeToWait.tv_nsec = now.tv_usec * 1000 + nanoseconds;
+
+	if(timeToWait.tv_nsec >= 1000000000)
 	{
-	        timeToWait.tv_nsec -= 1000000000;
-	        timeToWait.tv_sec++;
+		timeToWait.tv_nsec -= 1000000000;
+		timeToWait.tv_sec++;
 	}
 
 	pthread_mutex_lock(&fakeMutex);

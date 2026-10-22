@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file ConnectionGraph2.h
-/// \brief Connection graph plugin, version 2. Tells new systems about existing and new connections
-///
+ /// \file ConnectionGraph2.h
+ /// \brief Connection graph plugin, version 2. Tells new systems about existing and new connections
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -98,20 +98,20 @@ public:
 		uint16_t sendersPingToThatSystem;
 	};
 	/// \internal
-	static int SystemAddressAndGuidComp( const SystemAddressAndGuid &key, const SystemAddressAndGuid &data );
+	static int SystemAddressAndGuidComp(const SystemAddressAndGuid &key, const SystemAddressAndGuid &data);
 
 	/// \internal
 	struct RemoteSystem
 	{
-		DataStructures::OrderedList<SystemAddressAndGuid,SystemAddressAndGuid,ConnectionGraph2::SystemAddressAndGuidComp> remoteConnections;
+		DataStructures::OrderedList<SystemAddressAndGuid, SystemAddressAndGuid, ConnectionGraph2::SystemAddressAndGuidComp> remoteConnections;
 		RakNetGUID guid;
 	};
 	/// \internal
-	static int RemoteSystemComp( const RakNetGUID &key, RemoteSystem * const &data );
-	
+	static int RemoteSystemComp(const RakNetGUID &key, RemoteSystem * const &data);
+
 protected:
 	/// \internal
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 	/// \internal
 	virtual void OnNewConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
 	/// \internal

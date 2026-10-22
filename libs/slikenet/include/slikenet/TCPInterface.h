@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief A simple TCP based server allowing sends and receives.  Can be connected by any TCP client, including telnet.
-///
+ /// \file
+ /// \brief A simple TCP based server allowing sends and receives.  Can be connected by any TCP client, including telnet.
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -35,7 +35,6 @@
 #include "SocketIncludes.h"
 #include "DS_ByteQueue.h"
 #include "DS_ThreadsafeAllocatingQueue.h"
-#include "LocklessTypes.h"
 #include "PluginInterface2.h"
 
 #if OPEN_SSL_CLIENT_SUPPORT==1
@@ -59,7 +58,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(TCPInterface)
 
-	TCPInterface();
+		TCPInterface();
 	virtual ~TCPInterface();
 
 	// TODO - add socketdescriptor
@@ -68,14 +67,14 @@ public:
 	/// \param[in] maxIncomingConnections Max incoming connections we will accept
 	/// \param[in] maxConnections Max total connections, which should be >= maxIncomingConnections
 	/// \param[in] threadPriority Passed to the thread creation routine. Use THREAD_PRIORITY_NORMAL for Windows. For Linux based systems, you MUST pass something reasonable based on the thread priorities for your application.
-	/// \param[in] socketFamily IP version: For IPV4, use AF_INET (default). For IPV6, use AF_INET6. To autoselect, use AF_UNSPEC.
-	bool Start(unsigned short port, unsigned short maxIncomingConnections, unsigned short maxConnections=0, int _threadPriority=-99999, unsigned short socketFamily=AF_INET, const char *bindAddress=0);
+	/// \param[in] socketFamily IP version: For IPV4, use AF_INET (default). For IPV6, use AF_INET6. For dual stack, use AF_UNSPEC and set \a bindAddress to nullptr.
+	bool Start(unsigned short port, unsigned short maxIncomingConnections, unsigned short maxConnections = 0, int _threadPriority = -99999, unsigned short socketFamily = AF_INET, const char *bindAddress = nullptr);
 
 	/// Stops the TCP server
-	void Stop(void);
+	void Stop();
 
 	/// Connect to the specified host on the specified port
-	SystemAddress Connect(const char* host, unsigned short remotePort, bool block=true, unsigned short socketFamily=AF_INET, const char *bindAddress=0);
+	SystemAddress Connect(const char* host, unsigned short remotePort, bool block = true, unsigned short socketFamily = AF_INET, const char *bindAddress = nullptr);
 
 #if OPEN_SSL_CLIENT_SUPPORT==1
 	/// Start SSL on an existing connection, notified with HasCompletedConnectionAttempt
@@ -86,79 +85,76 @@ public:
 #endif
 
 	/// Sends a byte stream
-	virtual void Send( const char *data, unsigned int length, const SystemAddress &systemAddress, bool broadcast );
+	virtual void Send(const char *data, unsigned int length, const SystemAddress &systemAddress, bool broadcast);
 
 	// Sends a concatenated list of byte streams
-	virtual bool SendList( const char **data, const unsigned int  *lengths, const int numParameters, const SystemAddress &systemAddress, bool broadcast );
+	virtual bool SendList(const char **data, const unsigned int  *lengths, const int numParameters, const SystemAddress &systemAddress, bool broadcast);
 
 	// Get how many bytes are waiting to be sent. If too many, you may want to skip sending
 	unsigned int GetOutgoingDataBufferSize(SystemAddress systemAddress) const;
 
 	/// Returns if Receive() will return data
 	/// Do not use on PacketizedTCP
-	virtual bool ReceiveHasPackets( void );
+	virtual bool ReceiveHasPackets();
 
 	/// Returns data received
-	virtual Packet* Receive( void );
+	virtual Packet* Receive();
 
 	/// Disconnects a player/address
-	void CloseConnection( SystemAddress systemAddress );
+	void CloseConnection(SystemAddress systemAddress);
 
 	/// Deallocates a packet returned by Receive
-	void DeallocatePacket( Packet *packet );
+	void DeallocatePacket(Packet *packet);
 
 	/// Fills the array remoteSystems with the SystemAddress of all the systems we are connected to
 	/// \param[out] remoteSystems An array of SystemAddress structures to be filled with the SystemAddresss of the systems we are connected to. Pass 0 to remoteSystems to only get the number of systems we are connected to
-	/// \param[in, out] numberOfSystems As input, the size of remoteSystems array.  As output, the number of elements put into the array 
-	void GetConnectionList( SystemAddress *remoteSystems, unsigned short *numberOfSystems ) const;
+	/// \param[in, out] numberOfSystems As input, the size of remoteSystems array.  As output, the number of elements put into the array
+	void GetConnectionList(SystemAddress *remoteSystems, unsigned short *numberOfSystems) const;
 
 	/// Returns just the number of connections we have
-	unsigned short GetConnectionCount(void) const;
+	unsigned short GetConnectionCount() const;
 
 	/// Has a previous call to connect succeeded?
 	/// \return UNASSIGNED_SYSTEM_ADDRESS = no. Anything else means yes.
-	SystemAddress HasCompletedConnectionAttempt(void);
+	SystemAddress HasCompletedConnectionAttempt();
 
 	/// Has a previous call to connect failed?
 	/// \return UNASSIGNED_SYSTEM_ADDRESS = no. Anything else means yes.
-	SystemAddress HasFailedConnectionAttempt(void);
+	SystemAddress HasFailedConnectionAttempt();
 
 	/// Queued events of new incoming connections
-	SystemAddress HasNewIncomingConnection(void);
+	SystemAddress HasNewIncomingConnection();
 
 	/// Queued events of lost connections
-	SystemAddress HasLostConnection(void);
+	SystemAddress HasLostConnection();
 
 	/// Return an allocated but empty packet, for custom use
 	Packet* AllocatePacket(unsigned dataSize);
 
 	// Push a packet back to the queue
-	virtual void PushBackPacket( Packet *packet, bool pushAtHead );
+	virtual void PushBackPacket(Packet *packet, bool pushAtHead);
 
 	/// Returns if Start() was called successfully
-	bool WasStarted(void) const;
+	bool WasStarted() const;
 
-	void AttachPlugin( PluginInterface2 *plugin );
-	void DetachPlugin( PluginInterface2 *plugin );
+	void AttachPlugin(PluginInterface2 *plugin);
+	void DetachPlugin(PluginInterface2 *plugin);
 protected:
 
-	Packet* ReceiveInt( void );
+	Packet* ReceiveInt();
 
-#if defined(WINDOWS_STORE_RT)
-	bool CreateListenSocket_WinStore8(unsigned short port, unsigned short maxIncomingConnections, unsigned short socketFamily, const char *hostAddress);
-#else
 	bool CreateListenSocket(unsigned short port, unsigned short maxIncomingConnections, unsigned short socketFamily, const char *hostAddress);
-#endif
 
 	// Plugins
 	DataStructures::List<PluginInterface2*> messageHandlerList;
 
-	SLNet::LocklessUint32_t isStarted, threadRunning;
-	__TCPSOCKET__ listenSocket;
+	volatile bool isStarted = false;
+	volatile bool threadRunning = false;
+	__TCPSOCKET__ listenSocket = 0;
 
 	DataStructures::Queue<Packet*> headPush, tailPush;
-	RemoteClient* remoteClients;
-	unsigned short remoteClientsLength;
+	RemoteClient* remoteClients = nullptr;
+	unsigned short remoteClientsLength = 0;
 
 	// Assuming remoteClients is only used by one thread!
 	// DataStructures::List<RemoteClient*> remoteClients;
@@ -175,11 +171,11 @@ protected:
 		unsigned int length;
 	};
 	*/
-//	DataStructures::SingleProducerConsumer<OutgoingMessage> outgoingMessages;
-//	DataStructures::SingleProducerConsumer<Packet> incomingMessages;
-//	DataStructures::SingleProducerConsumer<SystemAddress> newIncomingConnections, lostConnections, requestedCloseConnections;
-//	DataStructures::SingleProducerConsumer<RemoteClient*> newRemoteClients;
-//	DataStructures::ThreadsafeAllocatingQueue<OutgoingMessage> outgoingMessages;
+	//	DataStructures::SingleProducerConsumer<OutgoingMessage> outgoingMessages;
+	//	DataStructures::SingleProducerConsumer<Packet> incomingMessages;
+	//	DataStructures::SingleProducerConsumer<SystemAddress> newIncomingConnections, lostConnections, requestedCloseConnections;
+	//	DataStructures::SingleProducerConsumer<RemoteClient*> newRemoteClients;
+	//	DataStructures::ThreadsafeAllocatingQueue<OutgoingMessage> outgoingMessages;
 	DataStructures::ThreadsafeAllocatingQueue<Packet> incomingMessages;
 	DataStructures::ThreadsafeAllocatingQueue<SystemAddress> newIncomingConnections, lostConnections, requestedCloseConnections;
 	DataStructures::ThreadsafeAllocatingQueue<RemoteClient*> newRemoteClients;
@@ -198,8 +194,8 @@ protected:
 	friend RAK_THREAD_DECLARATION(UpdateTCPInterfaceLoop);
 	friend RAK_THREAD_DECLARATION(ConnectionAttemptLoop);
 
-//	void DeleteRemoteClient(RemoteClient *remoteClient, fd_set *exceptionFD);
-//	void InsertRemoteClient(RemoteClient* remoteClient);
+	//	void DeleteRemoteClient(RemoteClient *remoteClient, fd_set *exceptionFD);
+	//	void InsertRemoteClient(RemoteClient* remoteClient);
 	__TCPSOCKET__ SocketConnect(const char* host, unsigned short remotePort, unsigned short socketFamily, const char *bindAddress);
 
 	struct ThisPtrPlusSysAddr
@@ -212,8 +208,8 @@ protected:
 	};
 
 #if OPEN_SSL_CLIENT_SUPPORT==1
-	SSL_CTX* ctx;
-	SSL_METHOD *meth;
+	SSL_CTX* ctx = nullptr;
+	SSL_METHOD *meth = nullptr;
 	DataStructures::ThreadsafeAllocatingQueue<SystemAddress> startSSL;
 	DataStructures::List<SystemAddress> activeSSLConnections;
 	SimpleMutex sharedSslMutex;
@@ -223,34 +219,22 @@ protected:
 /// Stores information about a remote client.
 struct RemoteClient
 {
-	RemoteClient() {
-#if OPEN_SSL_CLIENT_SUPPORT==1
-		ssl=0;
-#endif
-		isActive=false;
-#if !defined(WINDOWS_STORE_RT)
-		socket=0;
-#endif
-	}
-	__TCPSOCKET__ socket;
+	__TCPSOCKET__ socket = 0;
 	SystemAddress systemAddress;
 	DataStructures::ByteQueue outgoingData;
-	bool isActive;
+	bool isActive = false;
 	SimpleMutex outgoingDataMutex;
 	SimpleMutex isActiveMutex;
 
 #if OPEN_SSL_CLIENT_SUPPORT==1
-	SSL*     ssl;
+	SSL*     ssl = nullptr;
 	bool InitSSL(SSL_CTX* ctx, SSL_METHOD *meth);
-	void DisconnectSSL(void);
-	void FreeSSL(void);
-	int Send(const char *data, unsigned int length);
-	int Recv(char *data, const int dataSize);
-#else
-	int Send(const char *data, unsigned int length);
-	int Recv(char *data, const int dataSize);
+	void DisconnectSSL();
+	void FreeSSL();
 #endif
-	void Reset(void)
+	int Send(const char *data, unsigned int length);
+	int Recv(char *data, const int dataSize);
+	void Reset()
 	{
 		outgoingDataMutex.Lock();
 		outgoingData.Clear(_FILE_AND_LINE_);
@@ -265,4 +249,3 @@ struct RemoteClient
 #endif
 
 #endif // _RAKNET_SUPPORT_*
-

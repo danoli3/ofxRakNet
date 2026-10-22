@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,10 +13,10 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file FullyConnectedMesh2.h
-/// \brief Fully connected mesh plugin, revision 2.  
-/// \details This will connect RakPeer to all connecting peers, and all peers the connecting peer knows about.
-///
+ /// \file FullyConnectedMesh2.h
+ /// \brief Fully connected mesh plugin, revision 2.  
+ /// \details This will connect RakPeer to all connecting peers, and all peers the connecting peer knows about.
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -25,11 +25,11 @@
 #ifndef __FULLY_CONNECTED_MESH_2_H
 #define __FULLY_CONNECTED_MESH_2_H
 
+#include <slikenet/NativeTypes.h>
+#include <slikenet/string.h>
 #include "PluginInterface2.h"
 #include "memoryoverride.h"
-#include "NativeTypes.h"
 #include "DS_List.h"
-#include "string.h"
 #include "BitStream.h"
 
 typedef int64_t FCM2Guid;
@@ -50,7 +50,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(FullyConnectedMesh2)
 
-	FullyConnectedMesh2();
+		FullyConnectedMesh2();
 	virtual ~FullyConnectedMesh2();
 
 	/// When the message ID_REMOTE_NEW_INCOMING_CONNECTION arrives, we try to connect to that system
@@ -158,7 +158,7 @@ public:
 	/// \brief Notify the client of GetParticipantList() in order to connect to each of those systems until the mesh has been completed
 	/// \param[in] client The system to send ID_FCM2_VERIFIED_JOIN_START to
 	virtual void StartVerifiedJoin(RakNetGUID client);
-	
+
 	/// \brief On ID_FCM2_VERIFIED_JOIN_CAPABLE , accept or reject the new connection
 	/// \code
 	/// fullyConnectedMesh->RespondOnVerifiedJoinCapable(packet, true, 0);
@@ -209,7 +209,10 @@ public:
 	virtual void GetVerifiedJoinRejectedAdditionalData(Packet *packet, BitStream *additionalData);
 
 	/// Override to write data when ID_FCM2_VERIFIED_JOIN_CAPABLE is sent
-	virtual void WriteVJCUserData(SLNet::BitStream *bsOut) {(void) bsOut;}
+	virtual void WriteVJCUserData(SLNet::BitStream *bsOut)
+	{
+		(void)bsOut;
+	}
 
 	/// Use to read data written from WriteVJCUserData()
 	/// \code
@@ -223,7 +226,10 @@ public:
 	/// \param[in] userGuid The RakNetGuid of the user you are writing for
 	/// \param[in] userContext The data set with SetMyContext() for that system. May be empty. To properly write userContext, you will need to first write userContext->GetNumberOfBitsUsed(), followed by bsOut->Write(userContext);
 	//virtual void WriteVJSUserData(SLNet::BitStream *bsOut, RakNetGUID userGuid, BitStream *userContext) {(void) bsOut; (void) userGuid; (void) userContext;}
-	virtual void WriteVJSUserData(SLNet::BitStream *bsOut, RakNetGUID userGuid) {(void) bsOut; (void) userGuid;}
+	virtual void WriteVJSUserData(SLNet::BitStream *bsOut, RakNetGUID userGuid)
+	{
+		(void)bsOut; (void)userGuid;
+	}
 
 	/// \internal
 	SLNet::TimeUS GetElapsedRuntime(void);
@@ -237,7 +243,7 @@ public:
 	/// \internal
 	virtual void OnRakPeerShutdown(void);
 	/// \internal
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 	/// \internal
 	virtual void OnNewConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
 	/// \internal
@@ -246,8 +252,12 @@ public:
 	/// \internal
 	struct FCM2Participant
 	{
-		FCM2Participant() {}
-		FCM2Participant(const FCM2Guid &_fcm2Guid, const RakNetGUID &_rakNetGuid) : fcm2Guid(_fcm2Guid), rakNetGuid(_rakNetGuid) {}
+		FCM2Participant()
+		{
+		}
+		FCM2Participant(const FCM2Guid &_fcm2Guid, const RakNetGUID &_rakNetGuid) : fcm2Guid(_fcm2Guid), rakNetGuid(_rakNetGuid)
+		{
+		}
 
 		// Low half is a random number.
 		// High half is the order we connected in (totalConnectionCount)
@@ -298,7 +308,7 @@ protected:
 	void AssignOurFCMGuid(void);
 	void CalculateHost(RakNetGUID *rakNetGuid, FCM2Guid *fcm2Guid);
 	// bool AddParticipantInternal( RakNetGUID rakNetGuid, FCM2Guid theirFCMGuid, BitStream *userContext );
-	bool AddParticipantInternal( RakNetGUID rakNetGuid, FCM2Guid theirFCMGuid );
+	bool AddParticipantInternal(RakNetGUID rakNetGuid, FCM2Guid theirFCMGuid);
 	void CalculateAndPushHost(void);
 	bool ParticipantListComplete(void);
 	void IncrementTotalConnectionCount(unsigned int i);

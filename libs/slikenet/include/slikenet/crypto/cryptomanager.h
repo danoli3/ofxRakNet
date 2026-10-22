@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2019, SLikeSoft UG (haftungsbeschr‰nkt)
+ *  Copyright (c) 2019-2020, SLikeSoft UG (haftungsbeschr√§nkt)
  *
  *  This source code is  licensed under the MIT-style license found in the license.txt
  *  file in the root directory of this source tree.
@@ -8,47 +8,33 @@
 
 #include <openssl/evp.h> // used for EVP_xxxx
 
-namespace SLNet
+namespace SLNet::Experimental::Crypto
 {
-	namespace Experimental
-	{
-		namespace Crypto
-		{
-			class CCryptoManager
-			{
-			private:
-				// class members
-				// note: using distinct contexts for encryption/decryption to prevent potential for race conditions
-				// #med - consider moving to SessionEncrypter class
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
-				// ofxRakNet patch: EVP_CIPHER_CTX is opaque since OpenSSL 1.1 (allocated in Initialize())
-				static EVP_CIPHER_CTX* m_decryptionContext;
-				static EVP_CIPHER_CTX* m_encryptionContext;
-#else
-				static EVP_CIPHER_CTX m_decryptionContext;
-				static EVP_CIPHER_CTX m_encryptionContext;
-#endif
-				static unsigned char m_initializationVector[EVP_MAX_IV_LENGTH];
-				static unsigned char m_sessionKey[EVP_MAX_KEY_LENGTH];
-				static bool m_Initialized;
-
-			public:
-				// initialization
-				static bool Initialize();
-
-			public:
-				// session encryption
-				static bool EncryptSessionData(const unsigned char* plaintext, size_t dataLength, unsigned char* outBuffer, size_t& inOutBufferSize);
-				static bool DecryptSessionData(const unsigned char* encryptedtext, size_t dataLength, unsigned char* outBuffer, size_t& inOutBufferSize);
-				static bool GetRequiredEncryptionBufferSize(size_t& encryptionDataByteLength);
-
-			public:
-				// secure memory management methods
-				// #med - consider moving to separate class (SecureMemory/MemoryManager)
-				static void* AllocateSecureMemory(size_t size);
-				static void FreeSecureMemory(void* pointer, size_t size);
-				static void SecureClearMemory(void* pointer, size_t dataSize);
-			};
-		}
-	}
+class CCryptoManager
+{
+private:
+	// class members
+	// note: using distinct contexts for encryption/decryption to prevent potential for race conditions
+	// #med - consider moving to SessionEncrypter class
+	static inline EVP_CIPHER_CTX *m_decryptionContext = nullptr;
+	static inline EVP_CIPHER_CTX *m_encryptionContext = nullptr;
+	static inline unsigned char m_initializationVector[EVP_MAX_IV_LENGTH];
+	static inline unsigned char m_sessionKey[EVP_MAX_KEY_LENGTH];
+	static inline bool m_Initialized = false;
+public:
+	// initialization / terminate
+	static bool Initialize();
+	static void Terminate();
+public:
+	// session encryption
+	static bool EncryptSessionData(const unsigned char* plaintext, size_t dataLength, unsigned char* outBuffer, size_t& inOutBufferSize);
+	static bool DecryptSessionData(const unsigned char* encryptedtext, size_t dataLength, unsigned char* outBuffer, size_t& inOutBufferSize);
+	static bool GetRequiredEncryptionBufferSize(size_t& encryptionDataByteLength);
+public:
+	// secure memory management methods
+	// #med - consider moving to separate class (SecureMemory/MemoryManager)
+	static void* AllocateSecureMemory(size_t size);
+	static void FreeSecureMemory(void* pointer, size_t size);
+	static void SecureClearMemory(void* pointer, size_t dataSize);
+};
 }

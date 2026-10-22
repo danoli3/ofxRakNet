@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,10 +13,10 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file DirectoryDeltaTransfer.h
-/// \brief Simple class to send changes between directories.  
-/// \details In essence, a simple autopatcher that can be used for transmitting levels, skins, etc.
-///
+ /// \file DirectoryDeltaTransfer.h
+ /// \brief Simple class to send changes between directories.  
+ /// \details In essence, a simple autopatcher that can be used for transmitting levels, skins, etc.
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -72,8 +72,8 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(DirectoryDeltaTransfer)
 
-	// Constructor
-	DirectoryDeltaTransfer();
+		// Constructor
+		DirectoryDeltaTransfer();
 
 	// Destructor
 	virtual ~DirectoryDeltaTransfer();
@@ -155,7 +155,7 @@ public:
 	/// \param[in] _incrementalReadInterface If a file in \a fileList has no data, filePullInterface will be used to read the file in chunks of size \a chunkSize
 	/// \param[in] _chunkSize How large of a block of a file to send at once
 	void SetDownloadRequestIncrementalReadInterface(IncrementalReadInterface *_incrementalReadInterface, unsigned int _chunkSize);
-	
+
 	/// \internal For plugin handling
 	virtual PluginReceiveResult OnReceive(Packet *packet);
 protected:

@@ -3,13 +3,13 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  */
 
-/// \file
-///
+ /// \file
+ ///
 
 
 #ifndef SECURE_HANDSHAKE_H
@@ -20,7 +20,7 @@
 #if LIBCAT_SECURITY==1
 
 // If building a RakNet DLL, be sure to tweak the CAT_EXPORT macro meaning
-#if !defined(_RAKNET_LIB) && defined(_RAKNET_DLL)
+#ifdef _RAKNET_DLL
 # define CAT_BUILD_DLL
 #else
 # define CAT_NEUTER_EXPORT

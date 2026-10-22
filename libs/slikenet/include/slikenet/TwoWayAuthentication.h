@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,11 +13,11 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file TwoWayAuthentication.h
-/// \brief Implements two way authentication
-/// \details Given two systems, each of whom known a common password, verify the password without transmitting it
-/// This can be used to determine what permissions are should be allowed to the other system
-///
+ /// \file TwoWayAuthentication.h
+ /// \brief Implements two way authentication
+ /// \details Given two systems, each of whom known a common password, verify the password without transmitting it
+ /// This can be used to determine what permissions are should be allowed to the other system
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -44,9 +44,9 @@
 #define HASHED_NONCE_AND_PW_LENGTH SHA1_LENGTH
 #endif
 
+#include "NativeTypes.h"
 #include "PluginInterface2.h"
 #include "memoryoverride.h"
-#include "NativeTypes.h"
 #include "string.h"
 #include "DS_Hash.h"
 #include "DS_Queue.h"
@@ -70,7 +70,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(TwoWayAuthentication)
 
-	TwoWayAuthentication();
+		TwoWayAuthentication();
 	virtual ~TwoWayAuthentication();
 
 	/// \brief Adds a password to the list of passwords the system will accept
@@ -99,7 +99,7 @@ public:
 	/// \internal
 	virtual void OnRakPeerShutdown(void);
 	/// \internal
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 
 	/// \internal
 	struct PendingChallenge

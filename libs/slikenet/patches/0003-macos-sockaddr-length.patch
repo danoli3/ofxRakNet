@@ -1,0 +1,68 @@
+--- a/Source/src/RakNetSocket2_Windows_Linux_360.cpp
++++ b/Source/src/RakNetSocket2_Windows_Linux_360.cpp
+@@ -42,7 +42,8 @@
+ 		}
+ 
+ 
+-		len = sendto__(rns2Socket, sendParameters->data, sendParameters->length, 0, &sendParameters->systemAddress.address.addr, sizeof(sendParameters->systemAddress.address));
++		// ofxRakNet patch: the length of this address family, not of the whole union (macOS: EINVAL)
++		len = sendto__(rns2Socket, sendParameters->data, sendParameters->length, 0, &sendParameters->systemAddress.address.addr, (sendParameters->systemAddress.address.addr.sa_family == AF_INET6 ? sizeof(sockaddr_in6) : sizeof(sockaddr_in)));
+ 		if(len < 0)
+ 		{
+ 			RAKNET_DEBUG_PRINTF("sendto failed with code %i for char %hhu and length %i.\n", len, sendParameters->data[0], sendParameters->length);
+--- a/Source/src/Router2.cpp
++++ b/Source/src/Router2.cpp
+@@ -933,7 +933,8 @@
+ 	// SocketLayer::SendTo_PC( socket, (const char*) bs.GetData(), bs.GetNumberOfBytesUsed(), sa, __FILE__, __LINE__  );
+ 
+ 
+-	sendto__(socket, (const char*)bs.GetData(), bs.GetNumberOfBytesUsed(), 0, &sa.address.addr, sizeof(sa.address));
++	// ofxRakNet patch: the length of this address family, not of the whole union (macOS: EINVAL)
++	sendto__(socket, (const char*)bs.GetData(), bs.GetNumberOfBytesUsed(), 0, &sa.address.addr, (sa.address.addr.sa_family == AF_INET6 ? sizeof(sockaddr_in6) : sizeof(sockaddr_in)));
+ }
+ void Router2::SendOOBMessages(Router2::MiniPunchRequest *mpr)
+ {
+--- a/Source/src/RakNetTypes.cpp
++++ b/Source/src/RakNetTypes.cpp
+@@ -196,7 +196,8 @@
+ 		return;
+ 	}
+ 
+-	if(getnameinfo(&address.addr, sizeof(address), dest, destLength, nullptr, 0, NI_NUMERICHOST) != 0)
++	// ofxRakNet patch: the length of this address family, not of the whole union (macOS: EAI_FAMILY)
++	if(getnameinfo(&address.addr, (address.addr.sa_family == AF_INET6 ? sizeof(sockaddr_in6) : sizeof(sockaddr_in)), dest, destLength, nullptr, 0, NI_NUMERICHOST) != 0)
+ 	{
+ 		dest[0] = '\0';
+ 		return;
+--- a/Source/src/RakNetSocket2.cpp
++++ b/Source/src/RakNetSocket2.cpp
+@@ -310,6 +310,14 @@
+ 	bsp.data = (char*)&zero;
+ 	bsp.length = 4;
+ 	bsp.systemAddress = boundAddress;
++	// ofxRakNet patch: a wildcard bind (:: or 0.0.0.0) can't be sent to on macOS
++	// (sendto fails), so test with loopback on the bound port, as SLikeNet did.
++	if((boundAddress.GetIPVersion() == 6 && IN6_IS_ADDR_UNSPECIFIED(&boundAddress.address.addr6.sin6_addr)) ||
++		(boundAddress.GetIPVersion() == 4 && boundAddress.address.addr4.sin_addr.s_addr == htonl(INADDR_ANY)))
++	{
++		bsp.systemAddress.SetToLoopback(boundAddress.GetIPVersion());
++		bsp.systemAddress.SetPortHostOrder(boundAddress.GetPort());
++	}
+ 	bsp.ttl = 0;
+ 	RNS2SendResult sr = Send(&bsp, _FILE_AND_LINE_);
+ 	if(sr < 0)
+@@ -397,6 +405,14 @@
+ 	bsp.data = (char*)&zero;
+ 	bsp.length = 4;
+ 	bsp.systemAddress = boundAddress;
++	// ofxRakNet patch: a wildcard bind (:: or 0.0.0.0) can't be sent to on macOS
++	// (sendto fails), so test with loopback on the bound port, as SLikeNet did.
++	if((boundAddress.GetIPVersion() == 6 && IN6_IS_ADDR_UNSPECIFIED(&boundAddress.address.addr6.sin6_addr)) ||
++		(boundAddress.GetIPVersion() == 4 && boundAddress.address.addr4.sin_addr.s_addr == htonl(INADDR_ANY)))
++	{
++		bsp.systemAddress.SetToLoopback(boundAddress.GetIPVersion());
++		bsp.systemAddress.SetPortHostOrder(boundAddress.GetPort());
++	}
+ 	bsp.ttl = 0;
+ 	Send(&bsp, _FILE_AND_LINE_);
+ 

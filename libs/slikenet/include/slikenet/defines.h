@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -17,7 +17,7 @@
 #define __RAKNET_DEFINES_H
 
 #ifdef _RETAIL
-// retail builds imply release configurations
+ // retail builds imply release configurations
 #define _RELEASE
 #endif
 
@@ -73,7 +73,7 @@
 #endif
 
 /// Uncomment to use RakMemoryOverride for custom memory tracking
-/// See memoryoverride.h. 
+/// See memoryoverride.h.
 #ifndef _USE_RAK_MEMORY_OVERRIDE
 #define _USE_RAK_MEMORY_OVERRIDE 0
 #endif
@@ -103,17 +103,17 @@
 
 // Maximum number of local IP addresses supported
 #ifndef MAXIMUM_NUMBER_OF_INTERNAL_IDS
-#define MAXIMUM_NUMBER_OF_INTERNAL_IDS 10
+#define MAXIMUM_NUMBER_OF_INTERNAL_IDS 25
 #endif
 
 #ifndef RakAssert
-#if   defined(__native_client__)
-#define RakAssert(x)
+#ifdef __native_client__
+#define RakAssert(x) (void)(x);
 #else
-#if defined(_DEBUG)
+#ifdef _DEBUG
 #define RakAssert(x) assert(x);
 #else
-#define RakAssert(x) 
+#define RakAssert(x) (void)(x);
 #endif
 #endif
 #endif
@@ -162,11 +162,16 @@
 #endif
 
 #ifndef RAKNET_SUPPORT_IPV6
-#define RAKNET_SUPPORT_IPV6 0
+#define RAKNET_SUPPORT_IPV6 1
+#endif
+
+/// Set this to 1 if you want the implicit conversion e.g. of SLNet::RakString to const char*
+#ifndef USE_IMPLICIT_CONVERSIONS
+#define USE_IMPLICIT_CONVERSIONS 0
 #endif
 
 #ifndef RAKSTRING_TYPE
-#if defined(_UNICODE)
+#ifdef _UNICODE
 #define RAKSTRING_TYPE RakWString
 #define RAKSTRING_TYPE_IS_UNICODE 1
 #else

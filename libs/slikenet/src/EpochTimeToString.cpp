@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,29 +13,28 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "slikenet/FormatString.h"
-#include "slikenet/EpochTimeToString.h"
+#include <slikenet/FormatString.h>
+#include <slikenet/EpochTimeToString.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-// localtime
+ // localtime
 #include <time.h>
-#include "slikenet/LinuxStrings.h"
-#include "slikenet/linux_adapter.h"
-#include "slikenet/osx_adapter.h"
+#include <slikenet/LinuxStrings.h>
+#include <slikenet/crtstring_adapter.h>
 
 char * EpochTimeToString(long long time)
 {
-	static int textIndex=0;
+	static int textIndex = 0;
 	static char text[4][64];
 
-	if (++textIndex==4)
-		textIndex=0;
+	if(++textIndex == 4)
+		textIndex = 0;
 
 	struct tm timeinfo;
 	time_t t = time;
-	localtime_s ( &timeinfo, &t );
-	strftime (text[textIndex],64,"%c.",&timeinfo);
+	localtime_s(&timeinfo, &t);
+	strftime(text[textIndex], 64, "%c.", &timeinfo);
 
 	/*
 	time_t

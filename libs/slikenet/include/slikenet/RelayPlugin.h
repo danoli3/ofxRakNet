@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief Contains the class RelayPlugin
-///
+ /// \file
+ /// \brief Contains the class RelayPlugin
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -70,8 +70,8 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(RelayPlugin)
 
-	/// Constructor
-	RelayPlugin();
+		/// Constructor
+		RelayPlugin();
 
 	/// Destructor
 	virtual ~RelayPlugin();
@@ -116,7 +116,7 @@ public:
 	/// \internal
 	virtual PluginReceiveResult OnReceive(Packet *packet);
 	/// \internal
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 
 	struct StrAndGuidAndRoom
 	{
@@ -136,7 +136,7 @@ public:
 		RakString roomName;
 		DataStructures::List<StrAndGuid> usersInRoom;
 	};
-	
+
 protected:
 
 	RelayPlugin::RP_Group* JoinGroup(RakNetGUID userGuid, RakString roomName);

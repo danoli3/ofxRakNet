@@ -115,7 +115,7 @@
 #ifndef SHA1_H_A545E61D43E9404E8D736869AB3CBFE7
 #define SHA1_H_A545E61D43E9404E8D736869AB3CBFE7
 
-// KevinJ:
+ // KevinJ:
 #include "memoryoverride.h"
 #include <stdio.h> // Needed for file access
 
@@ -123,7 +123,7 @@
 
 #include <string.h> // Needed for strcat and strcpy
 #include "Export.h"
-//#define MAX_FILE_READ_BUFFER 8000 
+//#define MAX_FILE_READ_BUFFER 8000
 #define SHA1_LENGTH 20
 
 
@@ -140,7 +140,7 @@
 #endif
 
 
-#include <memory.h>
+#include <stdint.h>
 
 #include <limits.h>
 
@@ -172,10 +172,7 @@
 #define SHA1_WIPE_VARIABLES
 #endif
 
-#if defined(SHA1_HAS_TCHAR)
-#include <tchar.h>
-#else
-#ifdef _MSC_VER
+#if defined(SHA1_HAS_TCHAR) || defined(_WIN32)
 #include <tchar.h>
 #else
 #ifndef TCHAR
@@ -193,54 +190,14 @@
 #define _sntprintf snprintf
 #endif
 #endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////
-// Define variable types
-
-#ifndef UINT_8
-#ifdef _MSC_VER // Compiling with Microsoft compiler
-#define UINT_8 unsigned __int8
-#else // !_MSC_VER
-#define UINT_8 unsigned char
-#endif // _MSC_VER
-#endif
-
-#ifndef UINT_32
-#ifdef _MSC_VER // Compiling with Microsoft compiler
-#define UINT_32 unsigned __int32
-#else // !_MSC_VER
-#if (ULONG_MAX == 0xFFFFFFFFUL)
-#define UINT_32 unsigned long
-#else
-#define UINT_32 unsigned int
-#endif
-#endif // _MSC_VER
-#endif // UINT_32
-
-#ifndef INT_64
-#ifdef _MSC_VER // Compiling with Microsoft compiler
-#define INT_64 __int64
-#else // !_MSC_VER
-#define INT_64 long long
-#endif // _MSC_VER
-#endif // INT_64
-
-#ifndef UINT_64
-#ifdef _MSC_VER // Compiling with Microsoft compiler
-#define UINT_64 unsigned __int64
-#else // !_MSC_VER
-#define UINT_64 unsigned long long
-#endif // _MSC_VER
-#endif // UINT_64
 
 ///////////////////////////////////////////////////////////////////////////
 // Declare SHA-1 workspace
 
 typedef union
 {
-	UINT_8 c[64];
-	UINT_32 l[16];
+	uint8_t c[64];
+	uint32_t l[16];
 } SHA1_WORKSPACE_BLOCK;
 
 class RAK_DLL_EXPORT CSHA1
@@ -257,16 +214,25 @@ public:
 #endif
 
 	// Constructor and destructor
-	CSHA1();
+	CSHA1()
+	{
+		(void)m_reserved0;
+		(void)m_reserved1;
+		m_block = (SHA1_WORKSPACE_BLOCK*)m_workspace;
+		Reset();
+	}
 
 #ifdef SHA1_WIPE_VARIABLES
-	~CSHA1();
+	~CSHA1()
+	{
+		Reset();
+	}
 #endif
 
 	void Reset();
 
 	// Hash in binary data and strings
-	void Update(const UINT_8* pbData, UINT_32 uLen);
+	void Update(const uint8_t* pbData, uint32_t uLen);
 
 #ifdef SHA1_UTILITY_FUNCTIONS
 	// Hash in file contents
@@ -286,25 +252,25 @@ public:
 #endif
 
 	// Get the raw message digest (20 bytes)
-	bool GetHash(UINT_8* pbDest20) const;
+	bool GetHash(uint8_t* pbDest20) const;
 
-unsigned char * GetHash( void ) const;
-// KevinJ: http://cseweb.ucsd.edu/~mihir/papers/hmac-cb.pdf
+	unsigned char * GetHash(void) const;
+	// KevinJ: http://cseweb.ucsd.edu/~mihir/papers/hmac-cb.pdf
 	static void HMAC(unsigned char *sharedKey, int sharedKeyLength, unsigned char *data, int dataLength, unsigned char output[SHA1_LENGTH]);
 
 private:
 	// Private SHA-1 transformation
-	void Transform(UINT_32* pState, const UINT_8* pBuffer);
+	void Transform(uint32_t* pState, const uint8_t* pBuffer);
 
 	// Member variables
-	UINT_32 m_state[5];
-	UINT_32 m_count[2];
-	UINT_32 m_reserved0[1]; // Memory alignment padding
-	UINT_8 m_buffer[64];
-	UINT_8 m_digest[20];
-	UINT_32 m_reserved1[3]; // Memory alignment padding
+	uint32_t m_state[5];
+	uint32_t m_count[2];
+	uint32_t m_reserved0[1]; // Memory alignment padding
+	uint8_t m_buffer[64];
+	uint8_t m_digest[20];
+	uint32_t m_reserved1[3]; // Memory alignment padding
 
-	UINT_8 m_workspace[64];
+	uint8_t m_workspace[64];
 	SHA1_WORKSPACE_BLOCK* m_block; // SHA1 pointer to the byte array above
 };
 

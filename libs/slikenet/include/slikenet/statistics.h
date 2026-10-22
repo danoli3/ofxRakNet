@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief A structure that holds all statistical data returned by RakNet.
-///
+ /// \file
+ /// \brief A structure that holds all statistical data returned by RakNet.
+ ///
 
 
 
@@ -67,7 +67,7 @@ struct RAK_DLL_EXPORT RakNetStatistics
 
 	/// For each type in RNSPerSecondMetrics, what is the total value over the lifetime of the connection?
 	uint64_t runningTotal[RNS_PER_SECOND_METRICS_COUNT];
-	
+
 	/// When did the connection start?
 	/// \sa SLNet::GetTimeUS()
 	SLNet::TimeUS connectionStartTime;
@@ -104,19 +104,19 @@ struct RAK_DLL_EXPORT RakNetStatistics
 	/// What is the average total packetloss over the lifetime of the connection?
 	float packetlossTotal;
 
-	RakNetStatistics& operator +=(const RakNetStatistics& other)
+	RakNetStatistics& operator+=(const RakNetStatistics& other)
 	{
 		unsigned i;
-		for (i=0; i < NUMBER_OF_PRIORITIES; i++)
+		for(i = 0; i < NUMBER_OF_PRIORITIES; i++)
 		{
-			messageInSendBuffer[i]+=other.messageInSendBuffer[i];
-			bytesInSendBuffer[i]+=other.bytesInSendBuffer[i];
+			messageInSendBuffer[i] += other.messageInSendBuffer[i];
+			bytesInSendBuffer[i] += other.bytesInSendBuffer[i];
 		}
 
-		for (i=0; i < RNS_PER_SECOND_METRICS_COUNT; i++)
+		for(i = 0; i < RNS_PER_SECOND_METRICS_COUNT; i++)
 		{
-			valueOverLastSecond[i]+=other.valueOverLastSecond[i];
-			runningTotal[i]+=other.runningTotal[i];
+			valueOverLastSecond[i] += other.valueOverLastSecond[i];
+			runningTotal[i] += other.runningTotal[i];
 		}
 
 		return *this;
@@ -133,7 +133,7 @@ struct RAK_DLL_EXPORT RakNetStatistics
 /// 2 high 
 /// 3 debugging congestion control
 void RAK_DLL_EXPORT StatisticsToString(RakNetStatistics *s, char *buffer, int verbosityLevel);
-void RAK_DLL_EXPORT StatisticsToString( RakNetStatistics *s, char *buffer, size_t bufferLength, int verbosityLevel );
+void RAK_DLL_EXPORT StatisticsToString(RakNetStatistics *s, char *buffer, size_t bufferLength, int verbosityLevel);
 
 } // namespace SLNet
 

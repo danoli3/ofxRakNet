@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief SocketLayer class implementation
-///
+ /// \file
+ /// \brief SocketLayer class implementation
+ ///
 
 
 
@@ -59,26 +59,17 @@ class RAK_DLL_EXPORT SocketLayer
 {
 
 public:
-	
-	/// Default Constructor
-	SocketLayer();
-	
-	// Destructor	
-	~SocketLayer();
-	
 	/*
 	/// Creates a bound socket to listen for incoming connections on the specified port
-	/// \param[in] port the port number 
-	/// \param[in] blockingSocket 
-	/// \return A new socket used for accepting clients 
+	/// \param[in] port the port number
+	/// \param[in] blockingSocket
+	/// \return A new socket used for accepting clients
 	static RakNetSocket* CreateBoundSocket( RakPeer *peer, unsigned short port, bool blockingSocket, const char *forceHostAddress, unsigned int sleepOn10048, unsigned int extraSocketOptions, unsigned short socketFamily, _PP_Instance_ chromeInstance );
 #if defined(WINDOWS_STORE_RT)
 	static RakNetSocket* CreateWindowsStore8Socket( RakPeer *peer, unsigned short port, bool blockingSocket, const char *forceHostAddress, unsigned int sleepOn10048, unsigned int extraSocketOptions, _PP_Instance_ chromeInstance );
 #endif
 	static RakNetSocket* CreateBoundSocket_IPV4( RakPeer *peer, unsigned short port, bool blockingSocket, const char *forceHostAddress, unsigned int sleepOn10048, unsigned int extraSocketOptions, _PP_Instance_ chromeInstance );
-	#if RAKNET_SUPPORT_IPV6==1
-		static RakNetSocket* CreateBoundSocket_SupportIPV4And6( RakPeer *peer, unsigned short port, bool blockingSocket, const char *forceHostAddress, unsigned int sleepOn10048, unsigned int extraSocketOptions, unsigned short socketFamily, _PP_Instance_ chromeInstance );
-	#endif
+	static RakNetSocket* CreateBoundSocket_SupportIPV4And6( RakPeer *peer, unsigned short port, bool blockingSocket, const char *forceHostAddress, unsigned int sleepOn10048, unsigned int extraSocketOptions, unsigned short socketFamily, _PP_Instance_ chromeInstance );
 	static RakNetSocket* CreateBoundSocket_PS3Lobby( unsigned short port, bool blockingSocket, const char *forceHostAddress, unsigned short socketFamily );
 	static RakNetSocket* CreateBoundSocket_PSP2( unsigned short port, bool blockingSocket, const char *forceHostAddress, unsigned short socketFamily );
 	*/
@@ -86,7 +77,7 @@ public:
 	/*
 #ifndef WINDOWS_STORE_RT
 	/// Returns if this specified port is in use, for UDP
-	/// \param[in] port the port number 
+	/// \param[in] port the port number
 	/// \return If this port is already in use
 	//static bool IsPortInUse_Old(unsigned short port, const char *hostAddress);
 	//static bool IsPortInUse(unsigned short port, const char *hostAddress, unsigned short socketFamily );
@@ -94,26 +85,24 @@ public:
 #endif
 	*/
 
-//	static const char* DomainNameToIP_Old( const char *domainName );
-//	static const char* DomainNameToIP( const char *domainName );
-	
-	/// Write \a data of length \a length to \a writeSocket
-	/// \param[in] writeSocket The socket to write to
-	/// \param[in] data The data to write
-	/// \param[in] length The length of \a data	
-	// static void Write( RakNetSocket*writeSocket, const char* data, const int length );
-	
-	/// Read data from a socket 
-	/// \param[in] s the socket 
-	/// \param[in] rakPeer The instance of rakPeer containing the recvFrom C callback
-	/// \param[in] errorCode An error code if an error occured .
-	/// \param[in] connectionSocketIndex Which of the sockets in RakPeer we are using
-	/// \return Returns true if you successfully read data, false on error.
-//	static void RecvFromBlocking_IPV4( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
-// 	#if RAKNET_SUPPORT_IPV6==1
-// 		static void RecvFromBlockingIPV4And6( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
-// 	#endif
-//	static void RecvFromBlocking( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
+	//	static const char* DomainNameToIP_Old( const char *domainName );
+	//	static const char* DomainNameToIP( const char *domainName );
+
+		/// Write \a data of length \a length to \a writeSocket
+		/// \param[in] writeSocket The socket to write to
+		/// \param[in] data The data to write
+		/// \param[in] length The length of \a data	
+		// static void Write( RakNetSocket*writeSocket, const char* data, const int length );
+
+		/// Read data from a socket 
+		/// \param[in] s the socket 
+		/// \param[in] rakPeer The instance of rakPeer containing the recvFrom C callback
+		/// \param[in] errorCode An error code if an error occured .
+		/// \param[in] connectionSocketIndex Which of the sockets in RakPeer we are using
+		/// \return Returns true if you successfully read data, false on error.
+	//	static void RecvFromBlocking_IPV4( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
+	// 	static void RecvFromBlockingIPV4And6( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
+	//	static void RecvFromBlocking( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
 #if defined(WINDOWS_STORE_RT)
 //	static void RecvFromBlocking_WindowsStore8( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
 #endif
@@ -133,9 +122,9 @@ public:
 	/// Retrieve all local IP address in a string format.
 	/// \param[in] s The socket whose port we are referring to
 	/// \param[in] ipList An array of ip address in dotted notation.
-	static void GetMyIP( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] );
+	static void GetMyIP(SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS]);
 
-	
+
 	/// Call sendto (UDP obviously)
 	/// \param[in] s the socket
 	/// \param[in] data The byte buffer to send 
@@ -167,34 +156,32 @@ public:
 //	static int SendTo( RakNetSocket *s, const char *data, int length, SystemAddress systemAddress, const char *file, const long line );
 
 //	static unsigned short GetLocalPort(RakNetSocket *s);
-	static unsigned short GetLocalPort( __UDPSOCKET__ s);
-//	static void GetSystemAddress_Old ( RakNetSocket *s, SystemAddress *systemAddressOut );
-	static void GetSystemAddress_Old ( __UDPSOCKET__ s, SystemAddress *systemAddressOut );
-//	static void GetSystemAddress ( RakNetSocket *s, SystemAddress *systemAddressOut );
-	static void GetSystemAddress ( __UDPSOCKET__ s, SystemAddress *systemAddressOut );
+	static unsigned short GetLocalPort(__UDPSOCKET__ s);
+	//	static void GetSystemAddress ( RakNetSocket *s, SystemAddress *systemAddressOut );
+	static void GetSystemAddress(__UDPSOCKET__ s, SystemAddress *systemAddressOut);
 
-//	static void SetSocketLayerOverride(SocketLayerOverride *_slo);
-//	static SocketLayerOverride* GetSocketLayerOverride(void) {return slo;}
+	//	static void SetSocketLayerOverride(SocketLayerOverride *_slo);
+	//	static SocketLayerOverride* GetSocketLayerOverride(void) {return slo;}
 
-// 	static int SendTo_PS3Lobby( RakNetSocket *s, const char *data, int length, const SystemAddress &systemAddress );
-// 	static int SendTo_PSP2( RakNetSocket *s, const char *data, int length, const SystemAddress &systemAddress );
-// 	static int SendTo_360( RakNetSocket *s, const char *data, int length, const char *voiceData, int voiceLength, const SystemAddress &systemAddress );
-// 	static int SendTo_PC( RakNetSocket *s, const char *data, int length, const SystemAddress &systemAddress, const char *file, const long line );
-// #if defined(WINDOWS_STORE_RT)
-// 	static int SendTo_WindowsStore8( RakNetSocket *s, const char *data, int length, const SystemAddress &systemAddress, const char *file, const long line );
-// #endif
-// 
-// 	static void SetDoNotFragment( RakNetSocket* listenSocket, int opt );
-// 	static void SetSocketOptions( RakNetSocket* listenSocket, bool blockingSocket, bool setBroadcast);
-	static void SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSocket, bool setBroadcast);
-	
+	// 	static int SendTo_PS3Lobby( RakNetSocket *s, const char *data, int length, const SystemAddress &systemAddress );
+	// 	static int SendTo_PSP2( RakNetSocket *s, const char *data, int length, const SystemAddress &systemAddress );
+	// 	static int SendTo_360( RakNetSocket *s, const char *data, int length, const char *voiceData, int voiceLength, const SystemAddress &systemAddress );
+	// 	static int SendTo_PC( RakNetSocket *s, const char *data, int length, const SystemAddress &systemAddress, const char *file, const long line );
+	// #if defined(WINDOWS_STORE_RT)
+	// 	static int SendTo_WindowsStore8( RakNetSocket *s, const char *data, int length, const SystemAddress &systemAddress, const char *file, const long line );
+	// #endif
+	// 
+	// 	static void SetDoNotFragment( RakNetSocket* listenSocket, int opt );
+	// 	static void SetSocketOptions( RakNetSocket* listenSocket, bool blockingSocket, bool setBroadcast);
+	static void SetSocketOptions(__UDPSOCKET__ listenSocket, bool blockingSocket, bool setBroadcast);
+
 
 	// AF_INET (default). For IPV6, use AF_INET6. To autoselect, use AF_UNSPEC.
 	static bool GetFirstBindableIP(char firstBindable[128], int ipProto);
 
 private:
 
-//	static SocketLayerOverride *slo;
+	//	static SocketLayerOverride *slo;
 };
 
 } // namespace SLNet

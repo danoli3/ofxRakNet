@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -16,9 +16,9 @@
 #ifndef __VARIABLE_DELTA_SERIALIZER_H
 #define __VARIABLE_DELTA_SERIALIZER_H
 
+#include <slikenet/NativeTypes.h>
 #include "VariableListDeltaTracker.h"
 #include "DS_MemoryPool.h"
-#include "NativeTypes.h"
 #include "BitStream.h"
 #include "PacketPriority.h"
 #include "DS_OrderedList.h"
@@ -164,41 +164,41 @@ public:
 	template <class VarType>
 	void SerializeVariable(SerializationContext *context, const VarType &variable)
 	{
-		if (context->newSystemSend)
+		if(context->newSystemSend)
 		{
-			if (context->variableHistory->variableListDeltaTracker.IsPastEndOfList()==false)
+			if(context->variableHistory->variableListDeltaTracker.IsPastEndOfList() == false)
 			{
 				// previously sent data to another system
 				context->bitStream->Write(true);
 				context->bitStream->Write(variable);
-				context->anyVariablesWritten=true;
+				context->anyVariablesWritten = true;
 			}
 			else
 			{
 				// never sent data to another system
 				context->variableHistory->variableListDeltaTracker.WriteVarToBitstream(variable, context->bitStream);
-				context->anyVariablesWritten=true;
+				context->anyVariablesWritten = true;
 			}
 		}
-		else if (context->serializationMode==UNRELIABLE_WITH_ACK_RECEIPT)
+		else if(context->serializationMode == UNRELIABLE_WITH_ACK_RECEIPT)
 		{
-			context->anyVariablesWritten|=
-			context->variableHistory->variableListDeltaTracker.WriteVarToBitstream(variable, context->bitStream, context->changedVariables->bitField, context->changedVariables->bitWriteIndex++);
+			context->anyVariablesWritten |=
+				context->variableHistory->variableListDeltaTracker.WriteVarToBitstream(variable, context->bitStream, context->changedVariables->bitField, context->changedVariables->bitWriteIndex++);
 		}
 		else
 		{
-			if (context->variableHistoryIdentical)
+			if(context->variableHistoryIdentical)
 			{
 				// Identical serialization to a number of systems
-				if (didComparisonThisTick==false)
-					context->anyVariablesWritten|=
+				if(didComparisonThisTick == false)
+					context->anyVariablesWritten |=
 					context->variableHistory->variableListDeltaTracker.WriteVarToBitstream(variable, context->bitStream);
 				// Else bitstream is written to at the end
 			}
 			else
 			{
 				// Per-system serialization
-				context->anyVariablesWritten|=
+				context->anyVariablesWritten |=
 					context->variableHistory->variableListDeltaTracker.WriteVarToBitstream(variable, context->bitStream);
 			}
 		}
@@ -230,7 +230,7 @@ protected:
 
 	// static int Replica2ObjectComp( const uint32_t &key, ChangedVariablesList* const &data );
 
-	static int UpdatedVariablesListPtrComp( const uint32_t &key, ChangedVariablesList* const &data );
+	static int UpdatedVariablesListPtrComp(const uint32_t &key, ChangedVariablesList* const &data);
 
 	// For each remote system, track the last values of variables we sent to them, and the history of what values changed per call to Send()
 	// Every serialize if a variable changes from its last value, send it out again
@@ -239,7 +239,7 @@ protected:
 	{
 		RakNetGUID guid;
 		VariableListDeltaTracker variableListDeltaTracker;
-		DataStructures::OrderedList<uint32_t,ChangedVariablesList*,VariableDeltaSerializer::UpdatedVariablesListPtrComp> updatedVariablesHistory;
+		DataStructures::OrderedList<uint32_t, ChangedVariablesList*, VariableDeltaSerializer::UpdatedVariablesListPtrComp> updatedVariablesHistory;
 	};
 	/// A list of RemoteSystemVariableHistory indexed by guid, one per connection that we serialize to
 	/// List is added to when SerializeConstruction is called, and removed from when SerializeDestruction is called, or when a given connection is dropped

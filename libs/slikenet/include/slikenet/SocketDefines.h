@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -16,43 +16,13 @@
 #ifndef __SOCKET_DEFINES_H
 #define __SOCKET_DEFINES_H
 
-/// Internal
+ /// Internal
 
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET -1
+#endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if   defined(WINDOWS_STORE_RT)
+#ifdef WINDOWS_STORE_RT
 	#include "WinRTSocketAdapter.h"
 	#define accept__ WinRTAccept
 	#define connect__ WinRTConnect
@@ -72,53 +42,38 @@
 	#define shutdown__ WinRTShutdown
 	#define WSASendTo__ WinRTSendTo
 #else
-
-
-
-
-
-
-	#if   defined(_WIN32)
+	#ifdef _WIN32
 		#define closesocket__ closesocket
-		#define select__ select
 	#elif defined(__native_client__)
 		// namespace SLNet { void CloseSocket(SOCKET s); }
 		// #define closesocket__ SLNet::CloseSocket
-		#define select__ select
 	#else
 		#define closesocket__ close
-		#define select__ select
 	#endif
+
+	#define select__ select
 	#define accept__ accept
 	#define connect__ connect
-
-
-
-		#define socket__ socket
-
+	
+	#define socket__ socket
+	
 	#define bind__ bind
 	#define getsockname__ getsockname
 	#define getsockopt__ getsockopt
-
-
-
+	
 	#define ioctlsocket__ ioctlsocket
 	#define listen__ listen
 	#define recv__ recv
 	#define recvfrom__ recvfrom
-
-
-
-		#define sendto__ sendto
-
+	
+	#define sendto__ sendto
+	
 	#define send__ send
-
-
-
-		#define setsockopt__ setsockopt
-
+	
+	#define setsockopt__ setsockopt
+	
 	#define shutdown__ shutdown
 	#define WSASendTo__ WSASendTo
-#endif
+#endif // WINDOWS_STORE_RT
 
-#endif
+#endif // __SOCKET_DEFINES_H

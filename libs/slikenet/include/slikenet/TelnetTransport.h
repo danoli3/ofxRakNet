@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief Contains TelnetTransport , used to supports the telnet transport protocol.  Insecure
-///
+ /// \file
+ /// \brief Contains TelnetTransport , used to supports the telnet transport protocol.  Insecure
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -44,14 +44,14 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(TelnetTransport)
 
-	TelnetTransport();
+		TelnetTransport();
 	virtual ~TelnetTransport();
 	bool Start(unsigned short port, bool serverMode);
 	void Stop(void);
-	void Send( SystemAddress systemAddress, const char *data, ... );
-	void CloseConnection( SystemAddress systemAddress );
-	Packet* Receive( void );
-	void DeallocatePacket( Packet *packet );
+	void Send(SystemAddress systemAddress, const char *data, ...);
+	void CloseConnection(SystemAddress systemAddress);
+	Packet* Receive(void);
+	void DeallocatePacket(Packet *packet);
 	SystemAddress HasNewIncomingConnection(void);
 	SystemAddress HasLostConnection(void);
 	CommandParserInterface* GetCommandParser(void);

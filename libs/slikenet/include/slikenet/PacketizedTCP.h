@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief A simple TCP based server allowing sends and receives.  Can be connected by any TCP client, including telnet.
-///
+ /// \file
+ /// \brief A simple TCP based server allowing sends and receives.  Can be connected by any TCP client, including telnet.
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -37,23 +37,23 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(PacketizedTCP)
 
-	PacketizedTCP();
+		PacketizedTCP();
 	virtual ~PacketizedTCP();
 
 	/// Stops the TCP server
 	void Stop(void);
 
 	/// Sends a byte stream
-	void Send( const char *data, unsigned length, const SystemAddress &systemAddress, bool broadcast );
+	void Send(const char *data, unsigned length, const SystemAddress &systemAddress, bool broadcast);
 
 	// Sends a concatenated list of byte streams
-	bool SendList( const char **data, const unsigned int *lengths, const int numParameters, const SystemAddress &systemAddress, bool broadcast );
+	bool SendList(const char **data, const unsigned int *lengths, const int numParameters, const SystemAddress &systemAddress, bool broadcast);
 
 	/// Returns data received
-	Packet* Receive( void );
+	Packet* Receive(void);
 
 	/// Disconnects a player/address
-	void CloseConnection( SystemAddress systemAddress );
+	void CloseConnection(SystemAddress systemAddress);
 
 	/// Has a previous call to connect succeeded?
 	/// \return UNASSIGNED_SYSTEM_ADDRESS = no. Anything else means yes.

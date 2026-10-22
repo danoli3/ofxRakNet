@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief Router2 plugin. Allows you to connect to a system by routing packets through another system that is connected to both you and the destination. Useful for getting around NATs.
-///
+ /// \file
+ /// \brief Router2 plugin. Allows you to connect to a system by routing packets through another system that is connected to both you and the destination. Useful for getting around NATs.
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -40,8 +40,12 @@ class RakPeerInterface;
 
 struct Router2DebugInterface
 {
-	Router2DebugInterface() {}
-	virtual ~Router2DebugInterface() {}
+	Router2DebugInterface()
+	{
+	}
+	virtual ~Router2DebugInterface()
+	{
+	}
 	virtual void ShowFailure(const char *message);
 	virtual void ShowDiagnostic(const char *message);
 };
@@ -62,11 +66,11 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(Router2)
 
-	Router2();
+		Router2();
 	virtual ~Router2();
 
 	/// Sets the socket family to use, either IPV4 or IPV6
-	/// \param[in] socketFamily For IPV4, use AF_INET (default). For IPV6, use AF_INET6. To autoselect, use AF_UNSPEC.
+	/// \param[in] socketFamily For IPV4, use AF_INET (default). For IPV6, use AF_INET6. For dual stack, use AF_UNSPEC.
 	void SetSocketFamily(unsigned short _socketFamily);
 
 	/// \brief Query all connected systems to connect through them to a third system.
@@ -104,7 +108,7 @@ public:
 	// --------------------------------------------------------------------------------------------
 	virtual PluginReceiveResult OnReceive(Packet *packet);
 	virtual void Update(void);
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 	virtual void OnFailedConnectionAttempt(Packet *packet, PI2_FailedConnectionAttemptReason failedConnectionAttemptReason);
 	virtual void OnRakPeerShutdown(void);
 

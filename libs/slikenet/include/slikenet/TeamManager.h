@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,15 +13,15 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-// TODO: optimize the list of teams and team members to be O(1). Store in hashes, use linked lists to get ordered traversal
+ // TODO: optimize the list of teams and team members to be O(1). Store in hashes, use linked lists to get ordered traversal
 
-/// \file TeamManager.h
-/// \brief Automates networking and list management for teams
-/// \details TeamManager provides support for teams. A team is a list of team members.
-/// Teams contain properties including the number of team members per team, whether or not tagged teams must have equal numbers of members, and if a team is locked or not to certain entry conditions
-/// Team members contain properties including which teams they are on and which teams they want to join if a team is not immediately joinable
-/// Advanced functionality includes the ability for a team member to be on multiple teams simultaneously, the ability to swap teams with other members, and the ability to resize the number of members supported per team
-///
+ /// \file TeamManager.h
+ /// \brief Automates networking and list management for teams
+ /// \details TeamManager provides support for teams. A team is a list of team members.
+ /// Teams contain properties including the number of team members per team, whether or not tagged teams must have equal numbers of members, and if a team is locked or not to certain entry conditions
+ /// Team members contain properties including which teams they are on and which teams they want to join if a team is not immediately joinable
+ /// Advanced functionality includes the ability for a team member to be on multiple teams simultaneously, the ability to swap teams with other members, and the ability to resize the number of members supported per team
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -30,9 +30,9 @@
 #ifndef __TEAM_MANAGER_H
 #define __TEAM_MANAGER_H
 
+#include <slikenet/NativeTypes.h>
 #include "PluginInterface2.h"
 #include "memoryoverride.h"
-#include "NativeTypes.h"
 #include "DS_List.h"
 #include "types.h"
 #include "DS_Hash.h"
@@ -107,13 +107,13 @@ struct TeamSelection
 	TeamSelection(JoinTeamType itt, TM_Team *param);
 	TeamSelection(JoinTeamType itt, NoTeamId param);
 	JoinTeamType joinTeamType;
-	
+
 	union
 	{
 		TM_Team *specificTeamToJoin;
 		NoTeamId noTeamSubcategory;
 	} teamParameter;
-	
+
 	/// \brief Join any team that has available slots and is tagged with ALLOW_JOIN_ANY_AVAILABLE_TEAM
 	/// \details ID_TEAM_BALANCER_TEAM_ASSIGNED, ID_TEAM_BALANCER_REQUESTED_TEAM_FULL, or ID_TEAM_BALANCER_REQUESTED_TEAM_LOCKED will be returned to all systems.
 	static TeamSelection AnyAvailable(void);
@@ -139,9 +139,9 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(TM_TeamMember)
 
-	TM_TeamMember();
+		TM_TeamMember();
 	virtual ~TM_TeamMember();
-	
+
 	/// \brief Request to join any team, a specific team, or to leave all teams
 	/// \details Function will return false on invalid operations, such as joining a team you are already on.
 	/// Will also fail with TeamSelection::JOIN_ANY_AVAILABLE_TEAM if you are currently on a team.
@@ -151,17 +151,17 @@ public:
 	/// \param[in] TeamSelection::AnyAvailable(), TeamSelection::SpecificTeam(), or TeamSelection::NoTeam()
 	/// \return false On invalid or unnecessary operation. Otherwise returns true
 	bool RequestTeam(TeamSelection teamSelection);
-	
+
 	/// \brief Similar to RequestTeam with TeamSelection::SpecificTeam(), but leave a team simultaneously when the desired team is joinable
 	/// \param[in] teamToJoin Which team to join
 	/// \param[in] teamToLeave If 0, means leave all current teams. Otherwise, leave the specified team.
 	/// \return false On invalid or unnecessary operation. Otherwise returns true
 	bool RequestTeamSwitch(TM_Team *teamToJoin, TM_Team *teamToLeave);
-	
+
 	/// \brief Returns the first requested team in the list of requested teams, if you have a requested team at all.
 	/// \return TeamSelection::SpecificTeam(), TeamSelection::NoTeam(), or TeamSelection::AnyAvailable()
 	TeamSelection GetRequestedTeam(void) const;
-	
+
 	/// \brief Returns pending calls to RequestTeam() when using TeamSelection::JOIN_SPECIFIC_TEAM
 	/// \param[out] All pending requested teams
 	void GetRequestedSpecificTeams(DataStructures::List<TM_Team*> &requestedTeams) const;
@@ -178,14 +178,14 @@ public:
 
 	/// \return The number of teams that would be returned by a call to GetRequestedSpecificTeams()
 	unsigned int GetRequestedTeamCount(void) const;
-	
+
 	/// \brief Cancels a request to join a specific team.
 	/// \details Useful if you got ID_TEAM_BALANCER_REQUESTED_TEAM_FULL or ID_TEAM_BALANCER_REQUESTED_TEAM_LOCKED and changed your mind about joining the team.
 	/// \note This is not guaranteed to work due to latency. To clarify, If the host switches your team at the same time you call CancelRequestTeam() you may still get ID_TEAM_BALANCER_TEAM_ASSIGNED for the team you tried to cancel.
 	/// \param[in] specificTeamToCancel Which team to no longer join. Use 0 for all.
 	/// \return false On invalid or unnecessary operation. Otherwise returns true
 	bool CancelTeamRequest(TM_Team *specificTeamToCancel);
-	
+
 	/// \brief Leave a team
 	/// \details Leaves a team that you are on. Always succeeds provided you are on that team
 	/// Generates ID_TEAM_BALANCER_TEAM_ASSIGNED on all systems on success.
@@ -200,7 +200,7 @@ public:
 	/// \note This is the same as and just calls RequestTeam(TeamSelection::NoTeam(noTeamSubcategory));
 	/// \return false On invalid or unnecessary operation. Otherwise returns true
 	bool LeaveAllTeams(NoTeamId inNoTeamSubcategory);
-	
+
 	/// \return Get the first team we are on, or 0 if we are not on a team.
 	TM_Team* GetCurrentTeam(void) const;
 
@@ -209,7 +209,7 @@ public:
 
 	/// \return Returns one of the teams in the current team list, up to GetCurrentTeamCount()
 	TM_Team* GetCurrentTeamByIndex(unsigned int index);
-	
+
 	/// \param[out] Get all teams we are on, as a list
 	void GetCurrentTeams(DataStructures::List<TM_Team*> &_teams) const;
 
@@ -221,13 +221,13 @@ public:
 	/// \param[in] The team we are checking
 	/// \return Are we on this team?
 	bool IsOnTeam(TM_Team *team) const;
-	
+
 	/// \return The teamMemberID parameter passed to TM_World::ReferenceTeamMember()
 	NetworkID GetNetworkID(void) const;
-	
+
 	/// \return The TM_World instance that was used when calling TM_World::ReferenceTeamMember()
 	TM_World* GetTM_World(void) const;
-	
+
 	/// \brief Serializes the current state of this object
 	/// \details To replicate a TM_TeamMember on another system, first instantiate the object using your own code, or a system such as ReplicaManager3.
 	/// Next, call SerializeConstruction() from whichever system owns the team member
@@ -235,7 +235,7 @@ public:
 	/// \note You must instantiate and deserialize all TM_Team instances that the team member refers to before calling DesrializeConstruction(). ReplicaManager3::PostSerializeConstruction() and ReplicaManager3::PostDeserializeConstruction() will ensure this.
 	/// \param[out] constructionBitstream This object serialized to a BitStream
 	void SerializeConstruction(BitStream *constructionBitstream);
-	
+
 	/// \brief Deserializes the current state of this object
 	/// \details See SerializeConstruction for more details()
 	/// \note DeserializeConstruction also calls ReferenceTeamMember on the passed \a teamManager instance, there is no need to do so yourself
@@ -256,7 +256,7 @@ public:
 	unsigned int GetWorldIndex(void) const;
 
 	/// \internal
-	static unsigned long ToUint32( const NetworkID &g );
+	static unsigned long ToUint32(const NetworkID &g);
 
 	/// \internal
 	struct RequestedTeam
@@ -267,7 +267,7 @@ public:
 		bool isTeamSwitch;
 		TM_Team *teamToLeave;
 	};
-	
+
 protected:
 	NetworkID networkId;
 	TM_World* world;
@@ -319,9 +319,9 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(TM_Team)
 
-	TM_Team();
+		TM_Team();
 	virtual ~TM_Team();
-	
+
 	/// \brief Set the maximum number of members that can join this team.
 	/// Defaults to 65535
 	/// Setting the limit lower than the existing number of members kicks members out, and assigns noTeamSubcategory to them if they have no other team to go to
@@ -330,13 +330,13 @@ public:
 	/// \param[in] noTeamSubcategory Which noTeamSubcategory to assign to members that now have no team.
 	/// \return false On invalid or unnecessary operation. Otherwise returns true
 	bool SetMemberLimit(TeamMemberLimit _teamMemberLimit, NoTeamId noTeamSubcategory);
-	
+
 	/// \return If team balancing is on, the most members that can be on this team that would not either unbalance it or exceed the value passed to SetMemberLimit(). If team balancing is off, the same as GetMemberLimitSetting()
 	TeamMemberLimit GetMemberLimit(void) const;
 
 	/// \return What was passed to SetMemberLimit() or the default
 	TeamMemberLimit GetMemberLimitSetting(void) const;
-	
+
 	/// \brief Who can join this team under what conditions, while the team is not full
 	/// To not allow new joins, pass 0
 	/// To allow all new joins under any circumstances, bitwise-OR all permission defines.
@@ -345,19 +345,19 @@ public:
 	/// \param[in] _joinPermissions Bitwise combination of ALLOW_JOIN_ANY_AVAILABLE_TEAM, ALLOW_JOIN_SPECIFIC_TEAM, ALLOW_JOIN_REBALANCING
 	/// \return false On invalid or unnecessary operation. Otherwise returns true
 	bool SetJoinPermissions(JoinPermissions _joinPermissions);
-	
+
 	/// \return Whatever was passed to SetJoinPermissions(), or the default.
 	JoinPermissions GetJoinPermissions(void) const;
-	
+
 	/// \brief Removes a member from a team he or she is on
 	/// \details Identical to teamMember->LeaveTeam(this, noTeamSubcategory); See TeamMember::LeaveTeam() for details.
 	/// \param[in] teamMember Which team member to remove
 	/// \param[in] noTeamSubcategory If the team member has been removed from all teams, which subcategory of NoTeamId to set them to
 	void LeaveTeam(TM_TeamMember* teamMember, NoTeamId noTeamSubcategory);
-	
+
 	/// \return What was passed as the \a applyBalancing parameter TM_World::ReferenceTeam() when this team was added.
 	bool GetBalancingApplies(void) const;
-	
+
 	/// \param[out] All team members of this team
 	void GetTeamMembers(DataStructures::List<TM_TeamMember*> &_teamMembers) const;
 
@@ -367,18 +367,18 @@ public:
 	/// \return A team member on this team. Members are stored in the order they are added
 	/// \param[in] index A value between 0 and GetTeamMembersCount()
 	TM_TeamMember *GetTeamMemberByIndex(unsigned int index) const;
-	
+
 	/// \return The teamID parameter passed to TM_World::ReferenceTeam()
 	NetworkID GetNetworkID(void) const;
-	
+
 	/// \return The TM_World instance that was used when calling TM_World::ReferenceTeamMember()
 	TM_World* GetTM_World(void) const;
-	
+
 	/// \brief Used by the host to serialize the initial state of this object to a new system
 	/// \details On the host, when sending existing objects to a new system, call SerializeConstruction() on each of those objects to serialize creation state.
 	/// Creating the actual Team and TeamMember objects should be handled by your game code, or a system such as ReplicaManager3
 	void SerializeConstruction(BitStream *constructionBitstream);
-	
+
 	/// \brief Used by non-host systems to read the bitStream written by SerializeConstruction()
 	/// \details On non-host systems, after creating existing objects, call DeserializeConstruction() to read and setup that object
 	/// Creating the actual Team and TeamMember objects should be handled by your game code, or a system such as ReplicaManager3
@@ -394,8 +394,8 @@ public:
 	unsigned int GetWorldIndex(void) const;
 
 	/// \internal
-	static unsigned long ToUint32( const NetworkID &g );
-	
+	static unsigned long ToUint32(const NetworkID &g);
+
 protected:
 	NetworkID ID;
 	TM_World* world;
@@ -413,7 +413,7 @@ protected:
 
 	// Find the member index that wants to join the indicated team, is only on one team, and wants to leave that team
 	unsigned int GetMemberWithRequestedSingleTeamSwitch(TM_Team *team);
-	
+
 
 	friend class TM_World;
 	friend class TM_TeamMember;
@@ -557,7 +557,7 @@ public:
 	static int JoinRequestHelperComp(const TM_World::JoinRequestHelper &key, const TM_World::JoinRequestHelper &data);
 
 protected:
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 	virtual void OnNewConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
 
 	// Teams with too many members have those members go to other teams.
@@ -629,7 +629,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(TeamManager)
 
-	TeamManager();
+		TeamManager();
 	virtual ~TeamManager();
 
 	/// \brief Allocate a world to hold a list of teams and players for that team.
@@ -652,7 +652,7 @@ public:
 	/// \param[in] worldId \a worldId value passed to AddWorld()
 	/// \return Returns a world created with AddWorld(), or 0 if no such \a worldId
 	TM_World* GetWorldWithId(WorldId worldId) const;
-	
+
 	/// \brief When auto managing connections, call TM_World::AddParticipant() on all worlds for all new connections automatically
 	/// Defaults to true
 	/// \note You probably want this set to false if using multiple worlds	
@@ -665,7 +665,7 @@ public:
 	/// \note Defaults to TM_PEER_TO_PEER
 	/// \param[in] _topology Topology to use
 	void SetTopology(TMTopology _topology);
-	
+
 	/// \brief When you get ID_TEAM_BALANCER_REQUESTED_TEAM_FULL, pass the packet to this function to read out parameters
 	/// \param[in] A packet where packet->data[0]==ID_TEAM_BALANCER_REQUESTED_TEAM_FULL
 	/// \return true on success, false on read error
@@ -683,7 +683,7 @@ public:
 	/// \brief Clear all memory and reset everything.
 	/// \details Deallocates TM_World instances. It is up to the user to deallocate pointers passed to ReferenceTeamMember() or ReferenceTeam(), if so desired.
 	void Clear(void);
-	
+
 	/// \brief Reads out the world and teamMember from ID_TEAM_BALANCER_TEAM_ASSIGNED
 	/// \note You can get the current and prior team list from the teamMember itself
 	/// \param[in] A packet where packet->data[0]==ID_TEAM_BALANCER_TEAM_ASSIGNED
@@ -703,9 +703,9 @@ protected:
 
 	virtual void Update(void);
 	virtual PluginReceiveResult OnReceive(Packet *packet);
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 	virtual void OnNewConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
-	void Send( const SLNet::BitStream * bitStream, const AddressOrGUID systemIdentifier, bool broadcast );
+	void Send(const SLNet::BitStream * bitStream, const AddressOrGUID systemIdentifier, bool broadcast);
 
 	void EncodeTeamFullOrLocked(SLNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team);
 	void DecomposeTeamFullOrLocked(SLNet::BitStream *bsIn, TM_World **world, TM_TeamMember **teamMember, TM_Team **team,
@@ -749,7 +749,7 @@ protected:
 	bool autoAddParticipants;
 	TMTopology topology;
 
-	friend class TM_TeamMember; 
+	friend class TM_TeamMember;
 	friend class TM_World;
 	friend class TM_Team;
 };

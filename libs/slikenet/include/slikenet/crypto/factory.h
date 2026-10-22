@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2018-2019, SLikeSoft UG (haftungsbeschr‰nkt)
+ *  Copyright (c) 2018-2019, SLikeSoft UG (haftungsbeschr√§nkt)
  *
  *  This source code is  licensed under the MIT-style license found in the license.txt
  *  file in the root directory of this source tree.
@@ -9,18 +9,12 @@
 #include "securestring.h"   // used for SLNet::Crypto::CSecureString
 #include "ifileencrypter.h" // used for SLNet::Crypto::IFileEncrypter
 
-namespace SLNet
+namespace SLNet::Experimental::Crypto
 {
-	namespace Experimental
-	{
-		namespace Crypto
-		{
-			class Factory
-			{
-			public:
-				static IFileEncrypter* ConstructFileEncrypter(const char *publicKey, size_t publicKeyLength);
-				static IFileEncrypter* ConstructFileEncrypter(const char *publicKey, size_t publicKeyLength, const char *privateKey, size_t privateKeyLength, CSecureString& privateKeyPassword);
-			};
-		}
-	}
+class Factory
+{
+public:
+	static IFileEncrypter* ConstructFileEncrypter(const char *publicKey, size_t publicKeyLength);
+	static IFileEncrypter* ConstructFileEncrypter(const char *publicKey, size_t publicKeyLength, const char *privateKey, size_t privateKeyLength, CSecureString& privateKeyPassword);
+};
 }

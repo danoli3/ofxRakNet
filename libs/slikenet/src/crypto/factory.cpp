@@ -1,31 +1,25 @@
 /*
- *  Copyright (c) 2018-2019, SLikeSoft UG (haftungsbeschr‰nkt)
+ *  Copyright (c) 2018-2019, SLikeSoft UG (haftungsbeschr√§nkt)
  *
  *  This source code is  licensed under the MIT-style license found in the license.txt
  *  file in the root directory of this source tree.
  */
-#include "slikenet/crypto/factory.h"
+#include <slikenet/crypto/factory.h>
 
-// includes for concrete classes
-#include "slikenet/crypto/fileencrypter.h" // used for CFileEncrypter
+ // includes for concrete classes
+#include <slikenet/crypto/fileencrypter.h> // used for CFileEncrypter
 
-namespace SLNet
+namespace SLNet::Experimental::Crypto
 {
-	namespace Experimental
-	{
-		namespace Crypto
-		{
-			IFileEncrypter* Factory::ConstructFileEncrypter(const char *publicKey, size_t publicKeyLength)
-			{
-				return new CFileEncrypter(publicKey, publicKeyLength);
-			}
+IFileEncrypter* Factory::ConstructFileEncrypter(const char *publicKey, size_t publicKeyLength)
+{
+	return new CFileEncrypter(publicKey, publicKeyLength);
+}
 
-			// #high - change interface --- use RakString?
-			// #high - reconsider non-const CSecureString (for private key)
-			IFileEncrypter* Factory::ConstructFileEncrypter(const char *publicKey, size_t publicKeyLength, const char *privateKey, size_t privateKeyLength, CSecureString& privateKeyPassword)
-			{
-				return new CFileEncrypter(publicKey, publicKeyLength, privateKey, privateKeyLength, privateKeyPassword);
-			}
-		}
-	}
+// #high - change interface --- use RakString?
+// #high - reconsider non-const CSecureString (for private key)
+IFileEncrypter* Factory::ConstructFileEncrypter(const char *publicKey, size_t publicKeyLength, const char *privateKey, size_t privateKeyLength, CSecureString& privateKeyPassword)
+{
+	return new CFileEncrypter(publicKey, publicKeyLength, privateKey, privateKeyLength, privateKeyPassword);
+}
 }

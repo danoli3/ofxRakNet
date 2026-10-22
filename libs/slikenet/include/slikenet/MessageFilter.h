@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief Message filter plugin. Assigns systems to FilterSets.  Each FilterSet limits what messages are allowed.  This is a security related plugin.
-///
+ /// \file
+ /// \brief Message filter plugin. Assigns systems to FilterSets.  Each FilterSet limits what messages are allowed.  This is a security related plugin.
+ ///
 
 #include "NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_MessageFilter==1
@@ -38,7 +38,7 @@ namespace SLNet
 class RakPeerInterface;
 
 /// \internal Has to be public so some of the shittier compilers can use it.
-int RAK_DLL_EXPORT MessageFilterStrComp( char *const &key,char *const &data );
+int RAK_DLL_EXPORT MessageFilterStrComp(char *const &key, char *const &data);
 
 /// \internal Has to be public so some of the shittier compilers can use it.
 struct FilterSet
@@ -59,7 +59,7 @@ struct FilterSet
 };
 
 /// \internal Has to be public so some of the shittier compilers can use it.
-int RAK_DLL_EXPORT FilterSetComp( const int &key, FilterSet * const &data );
+int RAK_DLL_EXPORT FilterSetComp(const int &key, FilterSet * const &data);
 
 /// \internal Has to be public so some of the shittier compilers can use it.
 struct FilteredSystem
@@ -89,7 +89,7 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(MessageFilter)
 
-	MessageFilter();
+		MessageFilter();
 	virtual ~MessageFilter();
 
 	// --------------------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ public:
 	/// \param[in] messageIDStart The first ID_* message to allow in the range.  Inclusive.
 	/// \param[in] messageIDEnd The last ID_* message to allow in the range.  Inclusive.
 	/// \param[in] filterSetID A user defined ID to represent a filter set.  If no filter with this ID exists, one will be created with default settings.
-	void SetAllowMessageID(bool allow, int messageIDStart, int messageIDEnd,int filterSetID);
+	void SetAllowMessageID(bool allow, int messageIDStart, int messageIDEnd, int filterSetID);
 
 	/// Allow a specific RPC4 call
 	/// \pre MessageFilter must be attached before RPC4
@@ -169,8 +169,8 @@ public:
 	/// \param[in] An index between 0 and GetFilterSetCount()-1 inclusive
 	int GetFilterSetIDByIndex(unsigned index);
 
-    /// Delete a FilterSet.  All systems formerly subscribed to this filter are now unrestricted.
-	/// \param[in] filterSetID The ID of the filter set to delete.
+	/// Delete a FilterSet.  All systems formerly subscribed to this filter are now unrestricted.
+	    /// \param[in] filterSetID The ID of the filter set to delete.
 	void DeleteFilterSet(int filterSetID);
 
 	// --------------------------------------------------------------------------------------------
@@ -179,7 +179,7 @@ public:
 	virtual void Update(void);
 	virtual PluginReceiveResult OnReceive(Packet *packet);
 	virtual void OnNewConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 
 protected:
 

@@ -8,15 +8,15 @@
  * license found in the license.txt file in the root directory of this source tree.
  */
 
-///
-/// Original file by the_viking, fixed by Rômulo Fernandes
-/// Should emulate windows finddata structure
-///
+ ///
+ /// Original file by the_viking, fixed by Rômulo Fernandes
+ /// Should emulate windows finddata structure
+ ///
 
 #ifndef GCC_FINDFIRST_H
 #define GCC_FINDFIRST_H
 
-#if (defined(__GNUC__) || defined(__ARMCC_VERSION) || defined(__GCCXML__) || defined(__S3E__) ) && !defined(__WIN32)
+#if (defined(__GNUC__) || defined(__ARMCC_VERSION) || defined(__GCCXML__) || defined(__S3E__) ) && !defined(_WIN32)
 
 #include <dirent.h>
 
@@ -47,13 +47,13 @@ typedef struct _finddata_t
 	unsigned long   size;
 } _finddata;
 
-/** 
+/**
  *  Hold information about the current search
  */
 typedef struct _findinfo_t
 {
 	DIR*	openedDir;
-	SLNet::RakString filter;    
+	SLNet::RakString filter;
 	SLNet::RakString dirName;
 } _findinfo;
 

@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief Contains the NAT-type detection code for the server
-///
+ /// \file
+ /// \brief Contains the NAT-type detection code for the server
+ ///
 
 #include "NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_NatTypeDetectionServer==1
@@ -64,8 +64,8 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(NatTypeDetectionServer)
 
-	// Constructor
-	NatTypeDetectionServer();
+		// Constructor
+		NatTypeDetectionServer();
 
 	// Destructor
 	virtual ~NatTypeDetectionServer();
@@ -79,9 +79,9 @@ public:
 		const char *nonRakNetIP3,
 		const char *nonRakNetIP4
 #ifdef __native_client__
-		,_PP_Instance_ chromeInstance
+		, _PP_Instance_ chromeInstance
 #endif
-		);
+	);
 
 	// Releases the sockets created in Startup();
 	void Shutdown(void);
@@ -91,7 +91,7 @@ public:
 
 	/// \internal For plugin handling
 	virtual PluginReceiveResult OnReceive(Packet *packet);
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 
 	enum NATDetectionState
 	{
@@ -130,7 +130,7 @@ protected:
 	unsigned int GetDetectionAttemptIndex(RakNetGUID guid);
 
 	// s1p1 is rakpeer itself
-	RakNetSocket2 *s1p2,*s2p3,*s3p4,*s4p5;
+	RakNetSocket2 *s1p2, *s2p3, *s3p4, *s4p5;
 	//unsigned short s1p2Port, s2p3Port, s3p4Port, s4p5Port;
 	char s3p4Address[64];
 };

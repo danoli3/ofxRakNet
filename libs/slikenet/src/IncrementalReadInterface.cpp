@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,20 +13,20 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "slikenet/IncrementalReadInterface.h"
+#include <slikenet/IncrementalReadInterface.h>
 #include <stdio.h>
-#include "slikenet/linux_adapter.h"
-#include "slikenet/osx_adapter.h"
+#include <slikenet/crtstring_adapter.h>
 
 using namespace SLNet;
 
-unsigned int IncrementalReadInterface::GetFilePart( const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, void *preallocatedDestination, FileListNodeContext context)
+unsigned int IncrementalReadInterface::GetFilePart(const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, void *preallocatedDestination, FileListNodeContext context)
 {
+	(void)context;
 	FILE *fp;
-	if (fopen_s(&fp, filename, "rb")!=0)
+	if(fopen_s(&fp, filename, "rb") != 0)
 		return 0;
-	fseek(fp,startReadBytes,SEEK_SET);
-	unsigned int numRead = (unsigned int) fread(preallocatedDestination,1,numBytesToRead, fp);
+	fseek(fp, startReadBytes, SEEK_SET);
+	unsigned int numRead = (unsigned int)fread(preallocatedDestination, 1, numBytesToRead, fp);
 	fclose(fp);
 	return numRead;
 }

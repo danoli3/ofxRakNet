@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,18 +13,18 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file
-/// \brief \b [Internal] A class which stores a user message, and all information associated with sending and receiving that message.
-///
+ /// \file
+ /// \brief \b [Internal] A class which stores a user message, and all information associated with sending and receiving that message.
+ ///
 
 #ifndef __INTERNAL_PACKET_H
 #define __INTERNAL_PACKET_H
 
+#include <stdint.h>
 #include "PacketPriority.h"
 #include "types.h"
 #include "memoryoverride.h"
 #include "defines.h"
-#include "NativeTypes.h"
 #include "defines.h"
 #if USE_SLIDING_WINDOW_CONGESTION_CONTROL!=1
 #include "CCRakNetUDT.h"
@@ -32,7 +32,8 @@
 #include "CCRakNetSlidingWindow.h"
 #endif
 
-namespace SLNet {
+namespace SLNet
+{
 
 typedef uint16_t SplitPacketIdType;
 typedef uint32_t SplitPacketIndexType;
@@ -62,7 +63,7 @@ struct InternalPacketFixedSizeTransmissionHeader
 	///If this is a split packet, the index into the array of subsplit packets
 	SplitPacketIndexType splitPacketIndex;
 	///The size of the array of subsplit packets
-	SplitPacketIndexType splitPacketCount;;
+	SplitPacketIndexType splitPacketCount;
 	///How many bits long the data is
 	BitSize_t dataBitLength;
 	///What type of reliability algorithm to use with this packet
@@ -81,7 +82,7 @@ struct InternalPacketRefCountedData
 
 /// Holds a user message, and related information
 /// Don't use a constructor or destructor, due to the memory pool I am using
-struct InternalPacket : public InternalPacketFixedSizeTransmissionHeader
+struct InternalPacket : InternalPacketFixedSizeTransmissionHeader
 {
 	/// Identifies the order in which this number was sent. Used locally
 	MessageNumberType messageInternalOrder;
@@ -109,7 +110,7 @@ struct InternalPacket : public InternalPacketFixedSizeTransmissionHeader
 
 		/// data points to a larger block of data, where the larger block is reference counted. internalPacketRefCountedData is used in this case
 		REF_COUNTED,
-	
+
 		/// If allocation scheme is STACK, data points to stackData and should not be deallocated
 		/// This is only used when sending. Received packets are deallocated in RakPeer
 		STACK
@@ -124,7 +125,7 @@ struct InternalPacket : public InternalPacketFixedSizeTransmissionHeader
 
 	// Used for the resend queue
 	// Linked list implementation so I can remove from the list via a pointer, without finding it in the list
-	InternalPacket *resendPrev, *resendNext,*unreliablePrev,*unreliableNext;
+	InternalPacket *resendPrev, *resendNext, *unreliablePrev, *unreliableNext;
 
 	unsigned char stackData[128];
 };
@@ -132,4 +133,3 @@ struct InternalPacket : public InternalPacketFixedSizeTransmissionHeader
 } // namespace SLNet
 
 #endif
-

@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
@@ -13,9 +13,9 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
-/// \file FileListTransfer.h
-/// \brief A plugin to provide a simple way to compress and incrementally send the files in the FileList structure.
-///
+ /// \file FileListTransfer.h
+ /// \brief A plugin to provide a simple way to compress and incrementally send the files in the FileList structure.
+ ///
 
 
 #include "NativeFeatureIncludes.h"
@@ -66,20 +66,20 @@ public:
 	// GetInstance() and DestroyInstance(instance*)
 	STATIC_FACTORY_DECLARATIONS(FileListTransfer)
 
-	FileListTransfer();
+		FileListTransfer();
 	virtual ~FileListTransfer();
 
 	/// \brief Optionally start worker threads when using _incrementalReadInterface for the Send() operation
 	/// \param[in] numThreads how many worker threads to start
 	/// \param[in] threadPriority Passed to the thread creation routine. Use THREAD_PRIORITY_NORMAL for Windows. For Linux based systems, you MUST pass something reasonable based on the thread priorities for your application.
-	void StartIncrementalReadThreads(int numThreads, int threadPriority=-99999);
-	
+	void StartIncrementalReadThreads(int numThreads, int threadPriority = -99999);
+
 	/// \brief Allows one corresponding Send() call from another system to arrive.
 	/// \param[in] handler The class to call on each file
 	/// \param[in] deleteHandler True to delete the handler when it is no longer needed.  False to not do so.
 	/// \param[in] allowedSender Which system to allow files from.
 	/// \return A set ID value, which should be passed as the \a setID value to the Send() call on the other system.  This value will be returned in the callback and is unique per file set.  Returns 65535 on failure (not connected to sender)
-    unsigned short SetupReceive(FileListTransferCBInterface *handler, bool deleteHandler, SystemAddress allowedSender);
+	unsigned short SetupReceive(FileListTransferCBInterface *handler, bool deleteHandler, SystemAddress allowedSender);
 
 	/// \brief Send the FileList structure to another system, which must have previously called SetupReceive().
 	/// \param[in] fileList A list of files.  The data contained in FileList::data will be sent incrementally and compressed among all files in the set
@@ -90,7 +90,7 @@ public:
 	/// \param[in] orderingChannel Passed to RakPeerInterface::Send()
 	/// \param[in] _incrementalReadInterface If a file in \a fileList has no data, _incrementalReadInterface will be used to read the file in chunks of size \a chunkSize
 	/// \param[in] _chunkSize How large of a block of a file to read/send at once. Large values use more memory but transfer slightly faster.
-	void Send(FileList *fileList, SLNet::RakPeerInterface *rakPeer, SystemAddress recipient, unsigned short setID, PacketPriority priority, char orderingChannel, IncrementalReadInterface *_incrementalReadInterface=0, unsigned int _chunkSize=262144*4*16);
+	void Send(FileList *fileList, SLNet::RakPeerInterface *rakPeer, SystemAddress recipient, unsigned short setID, PacketPriority priority, char orderingChannel, IncrementalReadInterface *_incrementalReadInterface = 0, unsigned int _chunkSize = 262144 * 4 * 16);
 
 	/// Return number of files waiting to go out to a particular address
 	unsigned int GetPendingFilesToAddress(SystemAddress recipient);
@@ -124,7 +124,7 @@ public:
 	/// \internal For plugin handling
 	virtual void OnRakPeerShutdown(void);
 	/// \internal For plugin handling
-	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason);
 	/// \internal For plugin handling
 	virtual void Update(void);
 
