@@ -3,10 +3,10 @@
 Source: [SLikeSoft/SLikeNet](https://github.com/SLikeSoft/SLikeNet) `master` at `d5f775d` (2021-07-01),
 the last commit. SLikeNet is the maintained fork of RakNet 4.082 (Oculus / Facebook, archived).
 
-Included: the core library, `Source/include/slikenet/*.h` and `Source/src/*.cpp`. Left out:
-`Source/src/crypto` and `Source/include/slikenet/crypto` (file encryption helpers that need OpenSSL and
-aren't used by the networking core), samples, dependent extensions, and the RakNet compatibility
-headers in `Source/*.h`.
+Included: the core library, `Source/include/slikenet` and `Source/src`, with the `crypto` helpers and
+TLS client support built against openFrameworks' OpenSSL (apothecary's on macOS, iOS, Windows, Android
+and Emscripten, the system's through pkg-config on Linux). Left out: samples, dependent extensions, and
+the RakNet compatibility headers in `Source/*.h`.
 
 Licenses: `license/license.txt` (SLikeNet, MIT), `license/licenses/RakNet License.txt` (RakNet, BSD)
 and `RakNet Patents.txt`, as listed in SLikeNet's `_quick_licensing_slikenet_core.txt`.
@@ -49,3 +49,22 @@ an unsigned integer is undefined behaviour, and current clang (Xcode 26) compile
 `CCRakNetSlidingWindow::ShouldSendACKs` to a single `brk` instruction: every process crashed
 (`EXC_BREAKPOINT` on SLikeNet's network thread) as soon as a connection had an ACK to send. Fix: compare
 and return `UNSET_TIME_CC`, `(CCTimeType)-1`, which is well defined and the same value SLikeNet meant.
+
+## 0003: crypto helpers on OpenSSL 1.1+
+
+SLikeNet's `crypto` code (`CCryptoManager` session encryption, `CFileEncrypter` signing) was written
+for OpenSSL 1.0 and doesn't build with 1.1, 3.x or the 4.x openFrameworks ships:
+
+- `EVP_CIPHER_CTX` is opaque since 1.1: the two static contexts are now pointers, allocated with
+  `EVP_CIPHER_CTX_new()` in `Initialize()`.
+- `EVP_MD_CTX_cleanup` was removed: `EVP_MD_CTX_reset`.
+- `RAND_pseudo_bytes` (deprecated, not cryptographically strong) for the IV: `RAND_bytes`.
+
+All behind `OPENSSL_VERSION_NUMBER >= 0x10100000L`, so OpenSSL 1.0.2 still builds the original code.
+`example_tests` encrypts and decrypts through `CCryptoManager` (AES-256-CBC).
+
+## 0004: TLS on (configuration)
+
+`defineoverrides.h`, SLikeNet's user-editable settings file, sets `OPEN_SSL_CLIENT_SUPPORT 1`, so
+`TCPInterface` (`StartSSLClient`), `HTTPConnection`, `HTTPConnection2` and `Rackspace` can use TLS.
+Define `OPEN_SSL_CLIENT_SUPPORT 0` before including SLikeNet to build without it.

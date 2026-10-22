@@ -10,3 +10,9 @@
 
 // USER EDITABLE FILE
 
+
+// ofxRakNet: openFrameworks ships OpenSSL on every platform, so TCPInterface,
+// HTTPConnection(2) and Rackspace can use TLS (TCPInterface::StartSSLClient).
+#ifndef OPEN_SSL_CLIENT_SUPPORT
+#define OPEN_SSL_CLIENT_SUPPORT 1
+#endif

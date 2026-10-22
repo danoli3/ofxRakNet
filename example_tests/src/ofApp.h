@@ -8,6 +8,11 @@
 // SLikeNet internals, for the split-packet patch test
 #include "slikenet/ReliabilityLayer.h"
 #include "slikenet/InternalPacket.h"
+// OpenSSL parts (openFrameworks' OpenSSL)
+#include "slikenet/crypto/cryptomanager.h"
+#include "slikenet/TCPInterface.h"
+
+static_assert(OPEN_SSL_CLIENT_SUPPORT == 1, "TCPInterface should be built with TLS (defineoverrides.h)");
 
 #include <chrono>
 #include <thread>
@@ -50,6 +55,7 @@ class ofApp : public ofxUnitTestsApp {
 		testPassword();
 		testServerFull();
 		testSplitPacketPatch();
+		testCrypto();
 	}
 
 	void testConnectAndMessages() {
@@ -162,6 +168,24 @@ class ofApp : public ofxUnitTestsApp {
 		if (!sec.disconnects.empty()) {
 			ofxTest(sec.disconnects[0].reason == DisconnectionEvent::Reason::ServerFull, "reason: " + toString(sec.disconnects[0].reason));
 		}
+	}
+
+	// SLikeNet's crypto helpers, ported to OpenSSL 1.1+ (patch 0003)
+	void testCrypto() {
+		using SLNet::Experimental::Crypto::CCryptoManager;
+		ofxTest(CCryptoManager::Initialize(), "CCryptoManager::Initialize (OpenSSL)");
+		const std::string plain = "openFrameworks + SLikeNet + OpenSSL " OPENSSL_VERSION_TEXT;
+		size_t encryptedSize = plain.size();
+		ofxTest(CCryptoManager::GetRequiredEncryptionBufferSize(encryptedSize), "encryption buffer size");
+		std::vector<unsigned char> encrypted(encryptedSize);
+		ofxTest(CCryptoManager::EncryptSessionData(reinterpret_cast<const unsigned char *>(plain.data()), plain.size(),
+			encrypted.data(), encryptedSize), "AES-256 encrypt");
+		ofxTest(encryptedSize > 0 && std::memcmp(encrypted.data(), plain.data(), std::min(plain.size(), encryptedSize)) != 0, "ciphertext differs");
+		std::vector<unsigned char> decrypted(encryptedSize);
+		size_t decryptedSize = decrypted.size();
+		ofxTest(CCryptoManager::DecryptSessionData(encrypted.data(), encryptedSize, decrypted.data(), decryptedSize), "AES-256 decrypt");
+		ofxTest(std::string(reinterpret_cast<const char *>(decrypted.data()), decryptedSize) == plain, "round trip");
+		ofLogNotice() << "OpenSSL: " << OPENSSL_VERSION_TEXT;
 	}
 
 	// SLikeNet issue #82, defect 1: fragments that don't match the array allocated

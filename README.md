@@ -8,7 +8,8 @@ that needs to talk between machines, with connection events and message delivery
 It's built on [SLikeNet](https://github.com/SLikeSoft/SLikeNet), the maintained fork of RakNet 4
 (RakNet itself, by Oculus / Facebook, is archived). SLikeNet's core is included as source in
 `libs/slikenet`, with fixes for remote memory-safety bugs in large-message reassembly and a crash on
-current compilers: see [libs/slikenet/PATCHES.md](libs/slikenet/PATCHES.md).
+current compilers, and its OpenSSL parts (TLS for `TCPInterface` / HTTP, and the `crypto` helpers)
+ported to the OpenSSL openFrameworks ships: see [libs/slikenet/PATCHES.md](libs/slikenet/PATCHES.md).
 
 ## Quick start
 
@@ -71,7 +72,7 @@ the next find the port taken and connect to it. To connect across machines, set 
 |---|---|
 | `example_cursors` | every copy's mouse cursor in every window (unreliable sequenced, relayed by the server) |
 | `example_chat` | type and press Enter: JSON lines to everyone (reliable ordered) |
-| `example_tests` | the addon's tests, headless: servers and clients on localhost, text, JSON, a 1 MB message, broadcast, passwords, full servers, and the split-packet patch (43 checks) |
+| `example_tests` | the addon's tests, headless: servers and clients on localhost, text, JSON, a 1 MB message, broadcast, passwords, full servers, the split-packet patch, and AES encryption through OpenSSL (49 checks) |
 
 Build them with projectGenerator, or copy `scripts/templates/<platform>/Makefile` and `config.make`
 into the example folder.
@@ -80,7 +81,8 @@ into the example folder.
 
 Tested on macOS with the openFrameworks makefiles, projectGenerator / Xcode, and AddressSanitizer,
 and in CI on Linux and macOS. SLikeNet also supports Windows (Visual Studio, MSYS2), iOS and Android;
-`ws2_32` is linked on Windows from `ofxRakNet.cpp`.
+`ws2_32` is linked on Windows from `ofxRakNet.cpp`. OpenSSL comes from openFrameworks
+(`libs/openssl`, or the system's on Linux), so the addon needs nothing extra.
 
 ## License
 

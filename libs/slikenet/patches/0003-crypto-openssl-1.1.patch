@@ -1,0 +1,144 @@
+--- a/Source/include/slikenet/crypto/cryptomanager.h
++++ b/Source/include/slikenet/crypto/cryptomanager.h
+@@ -20,8 +20,14 @@
+ 				// class members
+ 				// note: using distinct contexts for encryption/decryption to prevent potential for race conditions
+ 				// #med - consider moving to SessionEncrypter class
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++				// ofxRakNet patch: EVP_CIPHER_CTX is opaque since OpenSSL 1.1 (allocated in Initialize())
++				static EVP_CIPHER_CTX* m_decryptionContext;
++				static EVP_CIPHER_CTX* m_encryptionContext;
++#else
+ 				static EVP_CIPHER_CTX m_decryptionContext;
+ 				static EVP_CIPHER_CTX m_encryptionContext;
++#endif
+ 				static unsigned char m_initializationVector[EVP_MAX_IV_LENGTH];
+ 				static unsigned char m_sessionKey[EVP_MAX_KEY_LENGTH];
+ 				static bool m_Initialized;
+--- a/Source/src/crypto/cryptomanager.cpp
++++ b/Source/src/crypto/cryptomanager.cpp
+@@ -18,6 +18,15 @@
+ #include <openssl/evp.h>     // used for EVP_xxxx, OpenSSL_add_all_algorithms()
+ #include <openssl/rand.h>    // used for RAND_xxxx
+ 
++// ofxRakNet patch: OpenSSL 1.1+ (opaque EVP_CIPHER_CTX, RAND_pseudo_bytes deprecated)
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++#define SLNET_ENCRYPTION_CONTEXT m_encryptionContext
++#define SLNET_DECRYPTION_CONTEXT m_decryptionContext
++#else
++#define SLNET_ENCRYPTION_CONTEXT (&m_encryptionContext)
++#define SLNET_DECRYPTION_CONTEXT (&m_decryptionContext)
++#endif
++
+ namespace SLNet
+ {
+ 	namespace Experimental
+@@ -45,9 +54,24 @@
+ 				if (RAND_bytes(m_sessionKey, EVP_MAX_KEY_LENGTH) == 0) {
+ 					return false; // failed to initialize the random session key
+ 				}
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++				if (RAND_bytes(m_initializationVector, EVP_MAX_IV_LENGTH) != 1) {
++					return false; // failed to initialize the initialization vector
++				}
++				if (m_encryptionContext == nullptr) {
++					m_encryptionContext = EVP_CIPHER_CTX_new();
++				}
++				if (m_decryptionContext == nullptr) {
++					m_decryptionContext = EVP_CIPHER_CTX_new();
++				}
++				if (m_encryptionContext == nullptr || m_decryptionContext == nullptr) {
++					return false; // failed to allocate the cipher contexts
++				}
++#else
+ 				if (RAND_pseudo_bytes(m_initializationVector, EVP_MAX_IV_LENGTH) == 0) {
+ 					return false; // failed to initialize the initialization vector
+ 				}
++#endif
+ 
+ 				m_Initialized = true;
+ 				return true;
+@@ -69,18 +93,18 @@
+ 
+ 				// #high - review usage of the CBC mode here --- not the best nowadays
+ 				// #med - add engine support to use HW-acceleration
+-				if (EVP_EncryptInit_ex(&m_encryptionContext, EVP_aes_256_cbc(), nullptr, m_sessionKey, m_initializationVector) == 0) {
++				if (EVP_EncryptInit_ex(SLNET_ENCRYPTION_CONTEXT, EVP_aes_256_cbc(), nullptr, m_sessionKey, m_initializationVector) == 0) {
+ 					return false; // failed to initialize the encryption context
+ 				}
+ 
+ 				int bytesWritten1;
+ 				// note: static_cast<> safe here, since GetRequiredEncrpytionBufferSize()-check ensured dataLength is <= int::max()
+-				if (EVP_EncryptUpdate(&m_encryptionContext, outBuffer, &bytesWritten1, plaintext, static_cast<int>(dataLength)) == 0) {
++				if (EVP_EncryptUpdate(SLNET_ENCRYPTION_CONTEXT, outBuffer, &bytesWritten1, plaintext, static_cast<int>(dataLength)) == 0) {
+ 					return false; // encryption failed
+ 				}
+ 				RakAssert(static_cast<size_t>(bytesWritten1) <= inOutBufferSize);
+ 				int bytesWritten2;
+-				if (EVP_EncryptFinal_ex(&m_encryptionContext, outBuffer + bytesWritten1, &bytesWritten2) == 0) {
++				if (EVP_EncryptFinal_ex(SLNET_ENCRYPTION_CONTEXT, outBuffer + bytesWritten1, &bytesWritten2) == 0) {
+ 					return false; // failed final encryption step
+ 				}
+ 				RakAssert(static_cast<size_t>(bytesWritten1) + static_cast<size_t>(bytesWritten2) <= inOutBufferSize);
+@@ -112,18 +136,18 @@
+ 
+ 				// #high - review usage of the CBC mode here --- not the best nowadays
+ 				// #med - add engine support to use HW-acceleration
+-				if (EVP_DecryptInit_ex(&m_decryptionContext, EVP_aes_256_cbc(), nullptr, m_sessionKey, m_initializationVector) == 0) {
++				if (EVP_DecryptInit_ex(SLNET_DECRYPTION_CONTEXT, EVP_aes_256_cbc(), nullptr, m_sessionKey, m_initializationVector) == 0) {
+ 					return false; // failed to initialize the decryption context
+ 				}
+ 
+ 				int bytesWritten1;
+ 				// static cast safe due to size-check above
+-				if (EVP_DecryptUpdate(&m_decryptionContext, outBuffer, &bytesWritten1, encryptedtext, static_cast<int>(dataLength)) == 0) {
++				if (EVP_DecryptUpdate(SLNET_DECRYPTION_CONTEXT, outBuffer, &bytesWritten1, encryptedtext, static_cast<int>(dataLength)) == 0) {
+ 					return false; // decryption failed
+ 				}
+ 				RakAssert(static_cast<size_t>(bytesWritten1) <= inOutBufferSize);
+ 				int bytesWritten2;
+-				if (EVP_DecryptFinal_ex(&m_decryptionContext, outBuffer + bytesWritten1, &bytesWritten2) == 0) {
++				if (EVP_DecryptFinal_ex(SLNET_DECRYPTION_CONTEXT, outBuffer + bytesWritten1, &bytesWritten2) == 0) {
+ 					return false; // failed final decryption step
+ 				}
+ 				RakAssert(static_cast<size_t>(bytesWritten1) + static_cast<size_t>(bytesWritten2) <= inOutBufferSize);
+@@ -174,8 +198,13 @@
+ 			}
+ 
+ 			// initialization list
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++			EVP_CIPHER_CTX* CCryptoManager::m_decryptionContext = nullptr;
++			EVP_CIPHER_CTX* CCryptoManager::m_encryptionContext = nullptr;
++#else
+ 			EVP_CIPHER_CTX CCryptoManager::m_decryptionContext;
+ 			EVP_CIPHER_CTX CCryptoManager::m_encryptionContext;
++#endif
+ 			unsigned char CCryptoManager::m_sessionKey[EVP_MAX_KEY_LENGTH];
+ 			unsigned char CCryptoManager::m_initializationVector[EVP_MAX_IV_LENGTH];
+ 			bool CCryptoManager::m_Initialized = false;
+--- a/Source/src/crypto/fileencrypter.cpp
++++ b/Source/src/crypto/fileencrypter.cpp
+@@ -107,7 +107,11 @@
+ 
+ 				// #med - review the return value here - it's not documented in the manual
+ 				// note: cleanup() must be called so to not leak resources generated during the EVP_SignalFinal()-call
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++				(void)EVP_MD_CTX_reset(rsaSigningContext); // ofxRakNet patch: EVP_MD_CTX_cleanup was removed in OpenSSL 1.1
++#else
+ 				(void)EVP_MD_CTX_cleanup(rsaSigningContext);
++#endif
+ 				EVP_MD_CTX_destroy(rsaSigningContext);
+ 
+ 				return success ? m_sigBuffer : nullptr;
+@@ -158,7 +162,11 @@
+ 				const int authenticStatus = EVP_DigestVerifyFinal(rsaVerifyContext, const_cast<unsigned char*>(signature), signatureLength);
+ 				// #med - review the return value here - it's not documented in the manual
+ 				// note: cleanup() must be called so to not leak resources generated during the EVP_SignalFinal()-call
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++				(void)EVP_MD_CTX_reset(rsaVerifyContext); // ofxRakNet patch: EVP_MD_CTX_cleanup was removed in OpenSSL 1.1
++#else
+ 				(void)EVP_MD_CTX_cleanup(rsaVerifyContext);
++#endif
+ 				EVP_MD_CTX_destroy(rsaVerifyContext);
+ 
+ 				if (authenticStatus == 1) {
