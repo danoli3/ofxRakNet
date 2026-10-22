@@ -5,14 +5,14 @@
 #include "ofxUnitTests.h"
 #include "ofxRakNet.h"
 
-// SLikeNet internals, for the split-packet patch test
-#include "slikenet/ReliabilityLayer.h"
-#include "slikenet/InternalPacket.h"
+// MafiaNet internals, for the split-packet test
+#include "mafianet/reliability_layer.h"
+#include "mafianet/internal_packet.h"
 // OpenSSL parts (openFrameworks' OpenSSL)
-#include "slikenet/crypto/cryptomanager.h"
-#include "slikenet/TCPInterface.h"
+#include "mafianet/crypto/cryptomanager.h"
+#include "mafianet/tcp_interface.h"
 
-static_assert(OPEN_SSL_CLIENT_SUPPORT == 1, "TCPInterface should be built with TLS (defineoverrides.h)");
+static_assert(OPEN_SSL_CLIENT_SUPPORT == 1, "TCPInterface should be built with TLS (define_overrides.h)");
 
 #include <chrono>
 #include <thread>
@@ -172,11 +172,11 @@ class ofApp : public ofxUnitTestsApp {
 		}
 	}
 
-	// SLikeNet's crypto helpers, ported to OpenSSL 1.1+ (patch 0003)
+	// MafiaNet's crypto helpers (OpenSSL 3+)
 	void testCrypto() {
-		using SLNet::Experimental::Crypto::CCryptoManager;
+		using MafiaNet::Experimental::Crypto::CCryptoManager;
 		ofxTest(CCryptoManager::Initialize(), "CCryptoManager::Initialize (OpenSSL)");
-		const std::string plain = "openFrameworks + SLikeNet + OpenSSL " OPENSSL_VERSION_TEXT;
+		const std::string plain = "openFrameworks + MafiaNet + OpenSSL " OPENSSL_VERSION_TEXT;
 		size_t encryptedSize = plain.size();
 		ofxTest(CCryptoManager::GetRequiredEncryptionBufferSize(encryptedSize), "encryption buffer size");
 		std::vector<unsigned char> encrypted(encryptedSize);
@@ -256,36 +256,42 @@ class ofApp : public ofxUnitTestsApp {
 		ofxTestEq(s.messages.size(), size_t(1), "requireEncryption drops the wrong-passphrase message");
 	}
 
-	// SLikeNet issue #82, defect 1: fragments that don't match the array allocated
-	// for their message must be rejected (the original only had RakAssert, empty in release)
+	// SLikeNet issue #82, defect 1 (fixed in MafiaNet): fragments that don't match
+	// the message they claim to belong to must be rejected
 	void testSplitPacketPatch() {
-		SLNet::InternalPacket first;
+		MafiaNet::InternalPacket first;
 		first.splitPacketId = 7;
 		first.splitPacketCount = 4;
 		first.splitPacketIndex = 0;
-		SLNet::SplitPacketSort sort;
-		sort.Preallocate(&first, __FILE__, __LINE__);
+		first.dataBitLength = 8 * 100;
+		MafiaNet::SplitPacketSort sort;
+		sort.Init(&first);
 		ofxTest(sort.Add(&first), "fragment 0 accepted");
 		ofxTest(!sort.Add(&first), "duplicate fragment rejected");
 
-		SLNet::InternalPacket outOfRange = first;
+		MafiaNet::InternalPacket outOfRange = first;
 		outOfRange.splitPacketIndex = 4;
 		ofxTest(!sort.Add(&outOfRange), "index == count rejected");
 
-		SLNet::InternalPacket otherCount = first;
+		MafiaNet::InternalPacket otherCount = first;
 		otherCount.splitPacketCount = 100000;
 		otherCount.splitPacketIndex = 50000;
 		ofxTest(!sort.Add(&otherCount), "fragment declaring a larger count rejected (was an out-of-bounds write)");
 
-		SLNet::InternalPacket otherId = first;
+		MafiaNet::InternalPacket otherId = first;
 		otherId.splitPacketId = 8;
 		otherId.splitPacketIndex = 1;
 		ofxTest(!sort.Add(&otherId), "fragment of another message rejected");
 
-		SLNet::InternalPacket second = first;
+		MafiaNet::InternalPacket second = first;
 		second.splitPacketIndex = 1;
 		ofxTest(sort.Add(&second), "matching fragment 1 accepted");
 		ofxTestEq(sort.GetNumAddedPackets(), 2u, "two fragments added");
+
+		MafiaNet::InternalPacket partialByte = first;
+		partialByte.splitPacketIndex = 2;
+		partialByte.dataBitLength = 8 * 100 - 3;
+		ofxTest(!sort.Add(&partialByte), "non-final fragment ending mid-byte rejected (was a heap overflow)");
 	}
 };
 

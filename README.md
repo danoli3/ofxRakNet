@@ -5,15 +5,14 @@
 RakNet networking for openFrameworks: reliable UDP for multiplayer, installations and anything else
 that needs to talk between machines, with connection events and message delivery on the main thread.
 
-It's built on [SLikeNet](https://github.com/SLikeSoft/SLikeNet), the maintained fork of RakNet 4
-(RakNet itself, by Oculus / Facebook, is archived). SLikeNet's core is included as source in
-`libs/slikenet`, with fixes for remote memory-safety bugs in large-message reassembly and a crash on
-current compilers, and its OpenSSL parts (TLS for `TCPInterface` / HTTP, and the `crypto` helpers)
-ported to the OpenSSL openFrameworks ships: see [libs/slikenet/PATCHES.md](libs/slikenet/PATCHES.md).
+**This is the `mafianet` branch:** it's built on [MafiaNet](https://github.com/MafiaHub/MafiaNet), an
+actively maintained fork of RakNet 4 and [SLikeNet](https://github.com/SLikeSoft/SLikeNet) (RakNet
+itself, by Oculus / Facebook, is archived; SLikeNet's last change was in 2021). MafiaNet's core is
+included as source in `libs/mafianet`, with TLS turned on for openFrameworks' OpenSSL: see
+[libs/mafianet/README.md](libs/mafianet/README.md). `master` uses SLikeNet with ofxRakNet's own fixes,
+which MafiaNet already has.
 
-> **Consider [ofxENet](https://github.com/danoli3/ofxENet) once it's complete.** SLikeNet hasn't had a
-> code change since 2021, and RakNet itself is archived, so this addon carries its own fixes (see
-> [PATCHES.md](libs/slikenet/PATCHES.md)). ofxENet has the same API (change `ofxRakNet` to `ofxENet`)
+> **Consider [ofxENet](https://github.com/danoli3/ofxENet) once it's complete.** ofxENet has the same API (change `ofxRakNet` to `ofxENet`)
 > on [ENet](https://github.com/zpl-c/enet), which is small and actively maintained. Stay on ofxRakNet if
 > you need RakNet itself: talking to other RakNet apps, or its plugins (replica manager, RPC, NAT
 > punch-through, TLS through TCPInterface).
@@ -88,12 +87,11 @@ disconnected, lost, connect failed, server full, invalid password, banned, incom
 already connected), `onMessage` (`MessageEvent`: `peer`, `address`, `type`, `data`, `getText()`,
 `getJson()`), and `onPacket` for any other RakNet packet.
 
-Message `type` is yours: 0 to `Peer::MAX_MESSAGE_TYPE` (121), one byte on the wire.
+Message `type` is yours: 0 to `Peer::MAX_MESSAGE_TYPE` (120), one byte on the wire.
 
 `Reliability`: `Unreliable`, `UnreliableSequenced` (positions, cursors: late ones are dropped),
 `Reliable`, `ReliableOrdered` (default: chat, state), `ReliableSequenced`. `Priority`: `Immediate`,
-`High` (default), `Medium`, `Low`. Large messages are split and reassembled for you (up to about 90 MB,
-see PATCHES.md).
+`High` (default), `Medium`, `Low`. Large messages are split and reassembled for you.
 
 ## Examples
 
@@ -105,7 +103,7 @@ the next find the port taken and connect to it. To connect across machines, set 
 | `example_cursors` | every copy's mouse cursor in every window (unreliable sequenced, relayed by the server) |
 | `example_chat` | type and press Enter: JSON lines to everyone (reliable ordered) |
 | `example_imgui_messenger` | needs [ofxImGui](https://github.com/jvcleave/ofxImGui) (`develop`): connection settings, a passphrase for encryption (with key fingerprint), a peer list with ping (pick who to send to, kick), compose text or JSON with any reliability / priority / channel, a chat view (name: text) and a filterable log with each message's SHA-256, and server relay with the original sender framed in. Start encrypted with `"passphrase"` in `settings.json` or `OFXRAKNET_PASSPHRASE` |
-| `example_tests` | the addon's tests, headless: servers and clients on localhost, text, JSON, a 1 MB message, broadcast, passwords, full servers, the split-packet patch, and SLikeNet's AES helpers, and ofxRakNet's encryption (cipher, salts, tampering, wrong passphrases, encrypted peers) (68 checks) |
+| `example_tests` | the addon's tests, headless: servers and clients on localhost, text, JSON, a 1 MB message, broadcast, passwords, full servers, split-packet checks, MafiaNet's AES helpers, and ofxRakNet's encryption (cipher, salts, tampering, wrong passphrases, encrypted peers) (69 checks) |
 
 Build them with projectGenerator, or copy `scripts/templates/<platform>/Makefile` and `config.make`
 into the example folder.
@@ -113,14 +111,14 @@ into the example folder.
 ## Platforms
 
 Tested on macOS with the openFrameworks makefiles, projectGenerator / Xcode, and AddressSanitizer,
-and in CI on Linux and macOS. SLikeNet also supports Windows (Visual Studio, MSYS2), iOS and Android;
+and in CI on Linux and macOS. MafiaNet also supports Windows (Visual Studio, MSYS2), iOS and Android;
 `ws2_32` is linked on Windows from `ofxRakNet.cpp`. OpenSSL comes from openFrameworks
 (`libs/openssl`, or the system's on Linux), so the addon needs nothing extra.
 
 ## License
 
-ofxRakNet: MIT, Dan Rosser. SLikeNet: MIT, SLikeSoft. RakNet: BSD, Oculus VR (see
-`libs/slikenet/license`).
+ofxRakNet: MIT, Dan Rosser. MafiaNet: MIT, MafiaHub. SLikeNet: MIT, SLikeSoft. RakNet: BSD, Oculus VR
+(see `libs/mafianet/license`).
 
 ```
 BSD License
@@ -130,4 +128,4 @@ Copyright (c) 2014, Oculus VR, Inc.
 All rights reserved.
 ```
 
-(full text in `libs/slikenet/license/licenses/RakNet License.txt`, patent grant in `RakNet Patents.txt`)
+(full text in `libs/mafianet/license/licenses/RakNet License.txt`, patent grant in `RakNet Patents.txt`)

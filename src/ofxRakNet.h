@@ -1,12 +1,12 @@
 #pragma once
 
-// ofxRakNet: RakNet networking for openFrameworks, built on SLikeNet
-// (https://github.com/SLikeSoft/SLikeNet), the maintained RakNet 4 fork, with
-// security fixes (see libs/slikenet/PATCHES.md).
+// ofxRakNet: RakNet networking for openFrameworks, built on MafiaNet
+// (https://github.com/MafiaHub/MafiaNet), the maintained RakNet / SLikeNet fork
+// (this branch; see libs/mafianet/README.md).
 //
 // ofxRakNet::Peer wraps a RakPeerInterface: start it as a server or a client,
 // send messages, and get connection / message events from update(), on the
-// main thread. getRakPeer() gives the full SLikeNet API for anything else.
+// main thread. getRakPeer() gives the full MafiaNet API for anything else.
 
 #include "ofEvents.h"
 #include "ofFileUtils.h"
@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-namespace SLNet {
+namespace MafiaNet {
 class RakPeerInterface;
 struct Packet;
 }
@@ -155,13 +155,13 @@ public:
 	ofEvent<MessageEvent> onMessage;
 	/// Every packet that isn't a connection event or an ofxRakNet message (other
 	/// RakNet message IDs, plugins). The packet is only valid during the event.
-	ofEvent<SLNet::Packet *> onPacket;
+	ofEvent<MafiaNet::Packet *> onPacket;
 
-	/// The SLikeNet peer, for the rest of the RakNet API (plugins, statistics, ...).
-	SLNet::RakPeerInterface * getRakPeer() const { return peer; }
+	/// The MafiaNet peer, for the rest of the RakNet API (plugins, statistics, ...).
+	MafiaNet::RakPeerInterface * getRakPeer() const { return peer; }
 
 private:
-	SLNet::RakPeerInterface * peer = nullptr;
+	MafiaNet::RakPeerInterface * peer = nullptr;
 	bool server = false;
 	ofEventListener updateListener;
 	std::vector<char> sendBuffer;

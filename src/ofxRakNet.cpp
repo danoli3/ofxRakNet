@@ -2,41 +2,41 @@
 
 #include "ofLog.h"
 
-#include "slikenet/peerinterface.h"
-#include "slikenet/MessageIdentifiers.h"
-#include "slikenet/types.h"
-#include "slikenet/PacketPriority.h"
+#include "mafianet/peer_interface.h"
+#include "mafianet/message_identifiers.h"
+#include "mafianet/types.h"
+#include "mafianet/packet_priority.h"
 
 #include <cstring>
 
 #if defined(_MSC_VER)
-#pragma comment(lib, "ws2_32.lib") // Winsock; SLikeNet links IPHLPAPI and Winmm itself
+#pragma comment(lib, "ws2_32.lib") // Winsock; MafiaNet links IPHLPAPI and Winmm itself
 #endif
 
 namespace ofxRakNet {
 
 namespace {
 
-PacketReliability toRakNet(Reliability r) {
+MafiaNet::Reliability toRakNet(Reliability r) {
 	switch (r) {
-	case Reliability::Unreliable: return UNRELIABLE;
-	case Reliability::UnreliableSequenced: return UNRELIABLE_SEQUENCED;
-	case Reliability::Reliable: return RELIABLE;
-	case Reliability::ReliableSequenced: return RELIABLE_SEQUENCED;
-	case Reliability::ReliableOrdered: default: return RELIABLE_ORDERED;
+	case Reliability::Unreliable: return MafiaNet::Reliability::Unreliable;
+	case Reliability::UnreliableSequenced: return MafiaNet::Reliability::UnreliableSequenced;
+	case Reliability::Reliable: return MafiaNet::Reliability::Reliable;
+	case Reliability::ReliableSequenced: return MafiaNet::Reliability::ReliableSequenced;
+	case Reliability::ReliableOrdered: default: return MafiaNet::Reliability::ReliableOrdered;
 	}
 }
 
-PacketPriority toRakNet(Priority p) {
+MafiaNet::Priority toRakNet(Priority p) {
 	switch (p) {
-	case Priority::Immediate: return IMMEDIATE_PRIORITY;
-	case Priority::Medium: return MEDIUM_PRIORITY;
-	case Priority::Low: return LOW_PRIORITY;
-	case Priority::High: default: return HIGH_PRIORITY;
+	case Priority::Immediate: return MafiaNet::Priority::Immediate;
+	case Priority::Medium: return MafiaNet::Priority::Medium;
+	case Priority::Low: return MafiaNet::Priority::Low;
+	case Priority::High: default: return MafiaNet::Priority::High;
 	}
 }
 
-std::string addressString(const SLNet::SystemAddress & address) {
+std::string addressString(const MafiaNet::SystemAddress & address) {
 	return address.ToString(true);
 }
 
@@ -70,12 +70,12 @@ Peer::~Peer() {
 
 bool Peer::start(uint16_t port, unsigned int maxConnections) {
 	stop();
-	peer = SLNet::RakPeerInterface::GetInstance();
-	SLNet::SocketDescriptor socket(port, nullptr);
+	peer = MafiaNet::RakPeerInterface::GetInstance();
+	MafiaNet::SocketDescriptor socket(port, nullptr);
 	auto result = peer->Startup(maxConnections, &socket, 1);
-	if (result != SLNet::RAKNET_STARTED) {
-		ofLogError("ofxRakNet") << "couldn't start on port " << port << " (SLikeNet StartupResult " << result << ")";
-		SLNet::RakPeerInterface::DestroyInstance(peer);
+	if (result != MafiaNet::RAKNET_STARTED) {
+		ofLogError("ofxRakNet") << "couldn't start on port " << port << " (MafiaNet StartupResult " << result << ")";
+		MafiaNet::RakPeerInterface::DestroyInstance(peer);
 		peer = nullptr;
 		return false;
 	}
@@ -108,8 +108,8 @@ bool Peer::connect(const std::string & host, uint16_t port, const std::string & 
 	}
 	auto result = peer->Connect(host.c_str(), port,
 		password.empty() ? nullptr : password.data(), static_cast<int>(password.size()));
-	if (result != SLNet::CONNECTION_ATTEMPT_STARTED) {
-		ofLogError("ofxRakNet") << "couldn't connect to " << host << ":" << port << " (SLikeNet ConnectionAttemptResult " << result << ")";
+	if (result != MafiaNet::CONNECTION_ATTEMPT_STARTED) {
+		ofLogError("ofxRakNet") << "couldn't connect to " << host << ":" << port << " (MafiaNet ConnectionAttemptResult " << result << ")";
 		return false;
 	}
 	return true;
@@ -117,14 +117,14 @@ bool Peer::connect(const std::string & host, uint16_t port, const std::string & 
 
 void Peer::disconnect(PeerId id) {
 	if (peer) {
-		peer->CloseConnection(SLNet::RakNetGUID(id), true);
+		peer->CloseConnection(MafiaNet::RakNetGUID(id), true);
 	}
 }
 
 void Peer::stop() {
 	if (peer) {
 		peer->Shutdown(300);
-		SLNet::RakPeerInterface::DestroyInstance(peer);
+		MafiaNet::RakPeerInterface::DestroyInstance(peer);
 		peer = nullptr;
 	}
 	server = false;
@@ -167,7 +167,7 @@ bool Peer::sendRaw(PeerId target, bool broadcast, uint8_t type, const void * dat
 	if (size > 0) {
 		std::memcpy(sendBuffer.data() + 1, data, size);
 	}
-	SLNet::AddressOrGUID to = target ? SLNet::AddressOrGUID(SLNet::RakNetGUID(target)) : SLNet::AddressOrGUID(SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+	MafiaNet::AddressOrGUID to = target ? MafiaNet::AddressOrGUID(MafiaNet::RakNetGUID(target)) : MafiaNet::AddressOrGUID(MafiaNet::UNASSIGNED_SYSTEM_ADDRESS);
 	return peer->Send(sendBuffer.data(), static_cast<int>(sendBuffer.size()), toRakNet(priority), toRakNet(reliability),
 		static_cast<char>(channel), to, broadcast) != 0;
 }
@@ -284,8 +284,8 @@ std::vector<PeerId> Peer::getConnections() const {
 	if (!peer) {
 		return result;
 	}
-	DataStructures::List<SLNet::SystemAddress> addresses;
-	DataStructures::List<SLNet::RakNetGUID> guids;
+	DataStructures::List<MafiaNet::SystemAddress> addresses;
+	DataStructures::List<MafiaNet::RakNetGUID> guids;
 	peer->GetSystemList(addresses, guids);
 	for (unsigned int i = 0; i < guids.Size(); i++) {
 		result.push_back(guids[i].g);
@@ -301,12 +301,12 @@ std::string Peer::getAddress(PeerId id) const {
 	if (!peer) {
 		return "";
 	}
-	auto address = peer->GetSystemAddressFromGuid(SLNet::RakNetGUID(id));
-	return address == SLNet::UNASSIGNED_SYSTEM_ADDRESS ? "" : addressString(address);
+	auto address = peer->GetSystemAddressFromGuid(MafiaNet::RakNetGUID(id));
+	return address == MafiaNet::UNASSIGNED_SYSTEM_ADDRESS ? "" : addressString(address);
 }
 
 int Peer::getPing(PeerId id) const {
-	return peer ? peer->GetAveragePing(SLNet::RakNetGUID(id)) : -1;
+	return peer ? peer->GetAveragePing(MafiaNet::RakNetGUID(id)) : -1;
 }
 
 PeerId Peer::getMyId() const {
