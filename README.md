@@ -11,6 +11,13 @@ It's built on [SLikeNet](https://github.com/SLikeSoft/SLikeNet), the maintained 
 current compilers, and its OpenSSL parts (TLS for `TCPInterface` / HTTP, and the `crypto` helpers)
 ported to the OpenSSL openFrameworks ships: see [libs/slikenet/PATCHES.md](libs/slikenet/PATCHES.md).
 
+> **Consider [ofxENet](https://github.com/danoli3/ofxENet) once it's complete.** SLikeNet hasn't had a
+> code change since 2021, and RakNet itself is archived, so this addon carries its own fixes (see
+> [PATCHES.md](libs/slikenet/PATCHES.md)). ofxENet has the same API (change `ofxRakNet` to `ofxENet`)
+> on [ENet](https://github.com/zpl-c/enet), which is small and actively maintained. Stay on ofxRakNet if
+> you need RakNet itself: talking to other RakNet apps, or its plugins (replica manager, RPC, NAT
+> punch-through, TLS through TCPInterface).
+
 ## Quick start
 
 ```cpp
