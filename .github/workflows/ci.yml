@@ -38,6 +38,9 @@ jobs:
         with:
           path: of/addons/ofxRakNet
 
+      - name: ofxImGui (develop) for example_imgui_messenger
+        run: git clone --depth 1 -b develop https://github.com/jvcleave/ofxImGui "$OF/addons/ofxImGui"
+
       - name: Dependencies (linux64)
         if: matrix.name == 'linux64'
         run: sudo "$OF/scripts/linux/ubuntu/install_dependencies.sh" -y
@@ -55,7 +58,7 @@ jobs:
         run: |
           JOBS=$(getconf _NPROCESSORS_ONLN)
           cd "$OF/addons/ofxRakNet"
-          for example in example_tests example_cursors example_chat; do
+          for example in example_tests example_cursors example_chat example_imgui_messenger; do
             echo "::group::$example"
             cp "$OF/scripts/templates/${{ matrix.template }}/Makefile" "$OF/scripts/templates/${{ matrix.template }}/config.make" "$example/"
             config=Release

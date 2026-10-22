@@ -72,6 +72,7 @@ the next find the port taken and connect to it. To connect across machines, set 
 |---|---|
 | `example_cursors` | every copy's mouse cursor in every window (unreliable sequenced, relayed by the server) |
 | `example_chat` | type and press Enter: JSON lines to everyone (reliable ordered) |
+| `example_imgui_messenger` | needs [ofxImGui](https://github.com/jvcleave/ofxImGui) (`develop`): connection settings, a peer list with ping (pick who to send to, kick), compose text or JSON with any reliability / priority / channel, a filterable log of everything sent and received, and server relay with the original sender framed in |
 | `example_tests` | the addon's tests, headless: servers and clients on localhost, text, JSON, a 1 MB message, broadcast, passwords, full servers, the split-packet patch, and AES encryption through OpenSSL (49 checks) |
 
 Build them with projectGenerator, or copy `scripts/templates/<platform>/Makefile` and `config.make`
