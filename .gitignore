@@ -1,0 +1,19 @@
+# build output
+example*/bin/*
+!example*/bin/data/
+example*/obj/
+
+# generated project files (projectGenerator / templates)
+example*/Makefile
+example*/config.make
+example*/CMakeLists.txt
+example*/*.xcodeproj
+example*/*.xcconfig
+example*/openFrameworks-Info.plist
+example*/of.entitlements
+example*/*.sln
+example*/*.vcxproj*
+example*/icon.rc
+example*/.vscode/
+build/
+.DS_Store
