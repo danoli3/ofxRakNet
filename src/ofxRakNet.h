@@ -11,6 +11,7 @@
 #include "ofEvents.h"
 #include "ofFileUtils.h"
 #include "ofJson.h"
+#include "ofxRakNetCrypto.h"
 
 #include <cstdint>
 #include <string>
@@ -64,8 +65,14 @@ struct MessageEvent {
 	std::string address;
 	/// The type given to send() (0 .. MAX_MESSAGE_TYPE).
 	uint8_t type = 0;
-	/// The payload, without the type byte.
+	/// The payload, without the type byte (decrypted if it was encrypted).
 	ofBuffer data;
+	/// The message was encrypted (see Peer::setPassphrase).
+	bool encrypted = false;
+	/// Encrypted, and decrypted and verified with our passphrase. False for
+	/// plain messages, and for encrypted ones that failed (wrong passphrase or
+	/// changed on the way; data is then empty).
+	bool authentic = false;
 
 	std::string getText() const { return data.getText(); }
 	/// The payload parsed as JSON (null if it isn't).
@@ -124,6 +131,18 @@ public:
 	/// Calls update() from ofEvents().update, before ofApp::update.
 	void setAutoUpdate(bool autoUpdate);
 
+	/// Encrypts every message sent with AES-256-GCM, under a key derived from
+	/// the passphrase (PBKDF2-HMAC-SHA256, random salt), and decrypts what
+	/// arrives (see ofxRakNetCrypto.h). Every peer needs the same passphrase.
+	/// Empty turns it off. Deriving the key takes a moment (200000 iterations).
+	void setPassphrase(const std::string & passphrase);
+	bool isEncrypting() const { return cipher.isEnabled(); }
+	/// The same on every peer with the same passphrase (compare to check).
+	std::string getFingerprint() const { return cipher.getFingerprint(); }
+	/// With a passphrase set: drop messages that aren't encrypted with it,
+	/// instead of delivering them with authentic = false.
+	bool requireEncryption = false;
+
 	std::vector<PeerId> getConnections() const;
 	size_t getNumConnections() const;
 	std::string getAddress(PeerId peer) const;
@@ -146,6 +165,7 @@ private:
 	bool server = false;
 	ofEventListener updateListener;
 	std::vector<char> sendBuffer;
+	crypto::Cipher cipher;
 
 	bool start(uint16_t port, unsigned int maxConnections);
 	bool sendRaw(PeerId target, bool broadcast, uint8_t type, const void * data, size_t size,

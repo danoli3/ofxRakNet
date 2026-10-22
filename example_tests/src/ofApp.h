@@ -56,6 +56,8 @@ class ofApp : public ofxUnitTestsApp {
 		testServerFull();
 		testSplitPacketPatch();
 		testCrypto();
+		testCipher();
+		testEncryptedMessages();
 	}
 
 	void testConnectAndMessages() {
@@ -186,6 +188,72 @@ class ofApp : public ofxUnitTestsApp {
 		ofxTest(CCryptoManager::DecryptSessionData(encrypted.data(), encryptedSize, decrypted.data(), decryptedSize), "AES-256 decrypt");
 		ofxTest(std::string(reinterpret_cast<const char *>(decrypted.data()), decryptedSize) == plain, "round trip");
 		ofLogNotice() << "OpenSSL: " << OPENSSL_VERSION_TEXT;
+	}
+
+	// ofxRakNet::crypto: PBKDF2 key + salt, AES-256-GCM, SHA-256
+	void testCipher() {
+		using namespace ofxRakNet::crypto;
+		ofxTestEq(toHex(sha256("abc")), std::string("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"), "SHA-256 test vector");
+
+		Cipher a, b, wrong;
+		a.setPassphrase("correct horse");
+		b.setPassphrase("correct horse");
+		wrong.setPassphrase("battery staple");
+		ofxTest(a.getFingerprint() == b.getFingerprint(), "same passphrase, same fingerprint");
+		ofxTest(a.getFingerprint() != wrong.getFingerprint(), "other passphrase, other fingerprint");
+
+		auto sealed = a.encrypt("meet at the gallery, 8pm");
+		ofxTest(Cipher::isEnvelope(sealed), "envelope");
+		ofxTestEq(sealed.size(), std::string("meet at the gallery, 8pm").size() + Cipher::OVERHEAD, "envelope size");
+		ofxTest(sealed.find("gallery") == std::string::npos, "plaintext not visible");
+		auto opened = b.decrypt(sealed);
+		ofxTest(opened && *opened == "meet at the gallery, 8pm", "decrypt with the same passphrase (other salt)");
+		ofxTest(!wrong.decrypt(sealed), "wrong passphrase rejected");
+
+		auto tampered = sealed;
+		tampered[Cipher::HEADER_SIZE + 2] ^= 1;
+		ofxTest(!b.decrypt(tampered), "changed ciphertext rejected");
+		auto tamperedSalt = sealed;
+		tamperedSalt[5] ^= 1;
+		ofxTest(!b.decrypt(tamperedSalt), "changed salt rejected");
+		ofxTest(a.encrypt("same") != a.encrypt("same"), "fresh nonce per message");
+		ofxTest(a.encrypt("x").substr(3, Cipher::SALT_SIZE) != b.encrypt("x").substr(3, Cipher::SALT_SIZE), "random salt per peer");
+		auto empty = a.encrypt("");
+		ofxTest(b.decrypt(empty) && b.decrypt(empty)->empty(), "empty message");
+	}
+
+	void testEncryptedMessages() {
+		Peer server, client, intruder;
+		detail::Log s, c;
+		s.attach(server);
+		c.attach(client);
+		server.setPassphrase("installation-42");
+		client.setPassphrase("installation-42");
+		intruder.setPassphrase("guess");
+		server.startServer(0, 8);
+		client.connect("127.0.0.1", server.getPort());
+		intruder.connect("127.0.0.1", server.getPort());
+		ofxTest(detail::pump({ &server, &client, &intruder }, [&] { return s.connects.size() == 2 && !c.connects.empty(); }), "encrypted peers connect");
+		if (c.connects.empty()) return;
+
+		client.send(c.connects[0].peer, 0, std::string("secret plan"));
+		intruder.broadcast(0, std::string("let me in"));
+		ofxTest(detail::pump({ &server, &client, &intruder }, [&] { return s.messages.size() >= 2; }), "server gets both");
+		bool sawGood = false, sawBad = false;
+		for (auto & m : s.messages) {
+			if (m.authentic && m.getText() == "secret plan") sawGood = true;
+			if (m.encrypted && !m.authentic && m.data.size() == 0) sawBad = true;
+		}
+		ofxTest(sawGood, "matching passphrase: encrypted, authentic, intact");
+		ofxTest(sawBad, "wrong passphrase: flagged, content withheld");
+
+		server.requireEncryption = true;
+		s.messages.clear();
+		intruder.broadcast(0, std::string("again"));
+		client.send(c.connects[0].peer, 0, std::string("still here"));
+		ofxTest(detail::pump({ &server, &client, &intruder }, [&] { return !s.messages.empty(); }), "authentic message delivered");
+		detail::pump({ &server, &client, &intruder }, [] { return false; }, 300);
+		ofxTestEq(s.messages.size(), size_t(1), "requireEncryption drops the wrong-passphrase message");
 	}
 
 	// SLikeNet issue #82, defect 1: fragments that don't match the array allocated

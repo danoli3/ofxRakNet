@@ -11,7 +11,10 @@
 // - Connection: server / client, host, port, password, start / stop
 // - Peers: everyone connected, with ping; pick who to send to; kick (server)
 // - Compose: text or JSON, reliability, priority, channel; Send or Broadcast
+// - Chat: the conversation, as name: text (names come from each peer's hello)
 // - Log: everything sent and received, with filters
+// - Encryption: a shared passphrase encrypts every message (AES-256-GCM, key from
+//   PBKDF2-HMAC-SHA256 with a random salt); the log shows each message's SHA-256
 // - Relay: a server can pass each client's messages on to the other clients.
 //   Relayed messages carry the original sender's id in front of the payload.
 class ofApp : public ofBaseApp {
@@ -38,6 +41,9 @@ public:
 		std::string reliability;
 		size_t bytes;
 		std::string text;
+		bool encrypted;
+		bool authentic;
+		std::string hash; // SHA-256 of the plaintext, hex
 	};
 
 	// networking
@@ -49,15 +55,35 @@ public:
 	void onConnect(ofxRakNet::ConnectionEvent & e);
 	void onDisconnect(ofxRakNet::DisconnectionEvent & e);
 	void onMessage(ofxRakNet::MessageEvent & e);
-	void log(bool sent, ofxRakNet::PeerId peer, uint8_t type, const std::string & payload, ofxRakNet::PeerId origin = 0);
+	void log(bool sent, ofxRakNet::PeerId peer, uint8_t type, const std::string & payload, ofxRakNet::PeerId origin = 0,
+		bool encrypted = false, bool authentic = false);
 	void info(const std::string & line);
 	std::string shortId(ofxRakNet::PeerId id) const;
 
+	// chat
+	struct ChatLine {
+		float time;
+		std::string name;
+		std::string text;
+		bool me;
+		bool system; // joined / left / renamed
+		bool encrypted;
+		bool failed; // couldn't decrypt
+	};
+	void chatLine(const std::string & name, const std::string & text, bool me = false, bool system = false,
+		bool encrypted = false, bool failed = false);
+	void chatMessage(ofxRakNet::PeerId sender, uint8_t type, const std::string & payload, bool encrypted = false);
+	std::string displayName(ofxRakNet::PeerId id) const;
+	void defaultName();
+	void sendName();
+
 	// panels
 	void drawConnection();
+	void drawEncryption();
 	void drawPeers();
 	void drawCompose();
 	void drawLog();
+	void drawChat();
 
 	ofxRakNet::Peer peer;
 	ofEventListeners listeners;
@@ -80,6 +106,17 @@ public:
 	int channel = 0;
 	char message[2048] = "hello from openFrameworks";
 	ofxRakNet::PeerId target = 0; // 0: everyone
+
+	// encryption
+	char passphrase[128] = "";
+	bool encrypt = false;
+	bool requireEncrypted = false;
+
+	// chat
+	char myName[64] = "";
+	bool nameEdited = false;
+	std::map<ofxRakNet::PeerId, std::string> names;
+	std::deque<ChatLine> chat;
 
 	// log
 	std::deque<LogEntry> entries;

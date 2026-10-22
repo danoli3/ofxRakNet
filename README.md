@@ -38,6 +38,31 @@ peer.broadcast(1, ofJson { { "x", 10 }, { "y", 20 } });
 peer.broadcast(2, &position, sizeof(position), 0, ofxRakNet::Reliability::UnreliableSequenced);
 ```
 
+## Encryption
+
+```cpp
+peer.setPassphrase("gallery-secret");   // every peer uses the same passphrase
+peer.requireEncryption = true;          // optional: drop anything not encrypted with it
+ofLog() << "key " << peer.getFingerprint();   // compare between machines
+
+peer.onMessage.newListener([](ofxRakNet::MessageEvent & e) {
+	if (e.encrypted && !e.authentic) return; // wrong passphrase, or changed on the way
+	ofLog() << e.getText();
+});
+```
+
+With a passphrase, every message's payload is encrypted with **AES-256-GCM** (OpenSSL), so its content
+is hidden and any change on the way is detected. The key comes from the passphrase with
+**PBKDF2-HMAC-SHA256** (200,000 iterations) and a random 16 byte **salt** per session. The salt travels
+with each message, and receivers derive each sender's key once and cache it. Every message gets a fresh
+random 12 byte nonce. `MessageEvent::encrypted` and `authentic` say what happened.
+`ofxRakNet::crypto` (`ofxRakNetCrypto.h`) has the pieces on their own: `Cipher`, `sha256`,
+`deriveKey`, `randomBytes`, `toHex`.
+
+Limits: the message type byte and sizes aren't hidden; there's no forward secrecy (anyone who learns
+the passphrase can read recorded traffic); a weak passphrase can be guessed offline, PBKDF2 only slows
+that down; and a relaying server needs the passphrase to read and re-send.
+
 ## Peer
 
 | | |
@@ -72,8 +97,8 @@ the next find the port taken and connect to it. To connect across machines, set 
 |---|---|
 | `example_cursors` | every copy's mouse cursor in every window (unreliable sequenced, relayed by the server) |
 | `example_chat` | type and press Enter: JSON lines to everyone (reliable ordered) |
-| `example_imgui_messenger` | needs [ofxImGui](https://github.com/jvcleave/ofxImGui) (`develop`): connection settings, a peer list with ping (pick who to send to, kick), compose text or JSON with any reliability / priority / channel, a filterable log of everything sent and received, and server relay with the original sender framed in |
-| `example_tests` | the addon's tests, headless: servers and clients on localhost, text, JSON, a 1 MB message, broadcast, passwords, full servers, the split-packet patch, and AES encryption through OpenSSL (49 checks) |
+| `example_imgui_messenger` | needs [ofxImGui](https://github.com/jvcleave/ofxImGui) (`develop`): connection settings, a passphrase for encryption (with key fingerprint), a peer list with ping (pick who to send to, kick), compose text or JSON with any reliability / priority / channel, a chat view (name: text) and a filterable log with each message's SHA-256, and server relay with the original sender framed in. Start encrypted with `"passphrase"` in `settings.json` or `OFXRAKNET_PASSPHRASE` |
+| `example_tests` | the addon's tests, headless: servers and clients on localhost, text, JSON, a 1 MB message, broadcast, passwords, full servers, the split-packet patch, and SLikeNet's AES helpers, and ofxRakNet's encryption (cipher, salts, tampering, wrong passphrases, encrypted peers) (68 checks) |
 
 Build them with projectGenerator, or copy `scripts/templates/<platform>/Makefile` and `config.make`
 into the example folder.

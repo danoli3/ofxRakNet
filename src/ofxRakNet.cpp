@@ -152,6 +152,16 @@ bool Peer::sendRaw(PeerId target, bool broadcast, uint8_t type, const void * dat
 		ofLogError("ofxRakNet") << "message too large: " << size << " bytes";
 		return false;
 	}
+	// the type byte stays readable; the payload is sealed when encrypting
+	std::string sealed;
+	if (cipher.isEnabled()) {
+		sealed = cipher.encrypt(std::string(static_cast<const char *>(data), size));
+		if (sealed.empty()) {
+			return false;
+		}
+		data = sealed.data();
+		size = sealed.size();
+	}
 	sendBuffer.resize(size + 1);
 	sendBuffer[0] = static_cast<char>(ID_USER_PACKET_ENUM + type);
 	if (size > 0) {
@@ -237,13 +247,28 @@ void Peer::update() {
 			e.peer = from;
 			e.address = address;
 			e.type = static_cast<uint8_t>(id - ID_USER_PACKET_ENUM);
-			e.data.set(reinterpret_cast<const char *>(packet->data + 1), packet->length - 1);
+			std::string payload(reinterpret_cast<const char *>(packet->data + 1), packet->length - 1);
+			e.encrypted = crypto::Cipher::isEnvelope(payload);
+			if (e.encrypted) {
+				auto plain = cipher.decrypt(payload);
+				e.authentic = plain.has_value();
+				if (plain) e.data.set(plain->data(), plain->size());
+			} else {
+				e.data.set(payload.data(), payload.size());
+			}
+			if (cipher.isEnabled() && requireEncryption && !e.authentic) {
+				continue;
+			}
 			ofNotifyEvent(onMessage, e, this);
 			continue;
 		}
 
 		ofNotifyEvent(onPacket, packet, this);
 	}
+}
+
+void Peer::setPassphrase(const std::string & passphrase) {
+	cipher.setPassphrase(passphrase);
 }
 
 void Peer::setAutoUpdate(bool autoUpdate) {
